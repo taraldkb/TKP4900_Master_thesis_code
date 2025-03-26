@@ -2,6 +2,7 @@ import numpy as np
 import time
 import os
 from utils.read_report_function import *
+from utils.map_value_function import *
 
 def run_cfd_step(fluent_session, current_state, action, design_params, report_path):
 
@@ -23,7 +24,6 @@ def run_cfd_step(fluent_session, current_state, action, design_params, report_pa
     N = design_params["N"]
 
     # Set boundary conditions
-
     try:
         solver.setup.boundary_conditions.velocity_inlet["wind"].vmag = wind_velocity
 
@@ -33,16 +33,16 @@ def run_cfd_step(fluent_session, current_state, action, design_params, report_pa
     # set injection velocity
     try:
         injection1 = solver.setup.models.discrete_phase.injections["injection1"]
-        injection1.properties.velocity = speed1
-        injection1.properties.mass_flow_rate = mass_flow
+        injection1.properties.velocity = map_value(speed1, 0, 20)
+        injection1.properties.mass_flow_rate = map_value(mass_flow, 50, 500)
     except Exception as e:
         print(f"[WARNING] Could not update injection1: {e}")
 
     if N == 2:
         try:
             injection2 = solver.setup.models.discrete_phase.injections["injection1"]
-            injection2.properties.velocity = speed2
-            injection2.properties.mass_flow_rate = mass_flow
+            injection2.properties.velocity = map_value(speed2, 0, 20)
+            injection2.properties.mass_flow_rate = map_value(mass_flow, 50, 500)
         except Exception as e:
             print(f"[WARNING] Could not update injection2: {e}")
 
