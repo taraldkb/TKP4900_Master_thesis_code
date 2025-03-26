@@ -36,10 +36,14 @@ class WaterInjectionEnv(gym.Env):
         self.state = None
 
         # create action space 3 actions [injection1, injection2, mass_flow], value between 0-1 for now CHANGE LATER !!
-        self.action_space = spaces.Box(low=0.0, high=1.0, shape=(3,), dtype=np.float32)
+        self.action_space = spaces.Box(low=np.array([0.0, 0.0, 0.0], dtype=np.float32),
+                                       high=np.array([0.0, 0.0, 500.0], dtype=np.float32),
+                                       shape=(3,), dtype=np.float32)
 
         # create observation space 8 obs [8 zones, wind], value between 0-1 for now CHANGE LATER !!
-        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(9,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=np.zeros(9, dtype=np.float32),
+                                            high=np.append(np.full(8, 15.0, dtype=np.float32), np.float32(1.0)),
+                                            shape=(9,), dtype=np.float32)
 
         # set points, static for now CHANGE LATER !!!!
         self.setpoints = np.full(8, 0.6)
@@ -96,5 +100,3 @@ class WaterInjectionEnv(gym.Env):
 
         # initialize case with hybrid initialization
         solver.solution.initialization.hybrid_initialize()
-
-
