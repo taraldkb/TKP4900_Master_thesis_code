@@ -1,0 +1,6 @@
+{
+  "type": "Fixed",
+  "ipt": 50,
+  "step_size": 0.1,
+  "total_steps": 20
+}
