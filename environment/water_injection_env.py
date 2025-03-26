@@ -39,7 +39,7 @@ class WaterInjectionEnv(gym.Env):
         self.action_space = spaces.Box(low=0.0, high=1.0, shape=(3,), dtype=np.float32)
 
         # create observation space 8 obs [8 zones, wind], value between 0-1 for now CHANGE LATER !!
-        self.action_space = spaces.Box(low=0.0, high=1.0, shape=(9,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(9,), dtype=np.float32)
 
         # set points, static for now CHANGE LATER !!!!
         self.setpoints = np.full(8, 0.6)
