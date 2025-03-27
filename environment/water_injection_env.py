@@ -59,9 +59,11 @@ class WaterInjectionEnv(gym.Env):
     def reset(self):  # reset environment for new episode
         self._start_fluent_with_case()
         self.step_count = 0
+        self._wind_step_counter = 0
 
         # create initial state MIGHT NEED TO CHANGE [ dpm concentration X8, wind velocity]
-        self.state = np.concatenate([np.full(8, 0.0), [5]])
+        self._current_wind = 0.5
+        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind]])
         return self.state
 
     # create function for taking time step
