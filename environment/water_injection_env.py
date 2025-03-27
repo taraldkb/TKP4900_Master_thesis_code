@@ -5,6 +5,7 @@ import os
 import json
 import ansys.fluent.core as pyfluent
 from ansys.fluent.core import launch_fluent
+import random
 
 
 class WaterInjectionEnv(gym.Env):
@@ -20,6 +21,7 @@ class WaterInjectionEnv(gym.Env):
         with open(trans_controls_path, "r") as f:
             self.trans_params = json.load(f)
 
+        # initial parameters and directories
         self.N = self.design_params["N"]
         self.H = self.design_params["H"]
         self.case_dir = case_dir
@@ -30,10 +32,16 @@ class WaterInjectionEnv(gym.Env):
         self.time_step_size = self.trans_params["step_size"]
         self.time_step_total = self.trans_params["total_steps"]
 
+        # create simulation variables
         self.fluent_session = None
         self.max_steps = 20
         self.step_count = 0
         self.state = None
+
+        # create wind tracking parameters
+        self.wind_change_interval = 5
+        self._wind_step_counter = 0
+        self._current_wind = 0.5
 
         # create action space 3 actions [injection1, injection2, mass_flow]
         self.action_space = spaces.Box(low=0.0,
@@ -51,13 +59,20 @@ class WaterInjectionEnv(gym.Env):
     def reset(self):  # reset environment for new episode
         self._start_fluent_with_case()
         self.step_count = 0
+        self._wind_step_counter = 0
 
         # create initial state MIGHT NEED TO CHANGE [ dpm concentration X8, wind velocity]
-        self.state = np.concatenate([np.full(8, 0.0), [5]])
+        self._current_wind = 0.5
+        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind]])
         return self.state
 
     # create function for taking time step
     def step(self, action):
+
+        # check for wind update
+        self._update_wind_velocity()
+
+        # Run cfd and gather observation
         next_state = self.run_cfd_step(
             self.fluent_session,
             self.state,
@@ -72,6 +87,17 @@ class WaterInjectionEnv(gym.Env):
         done = self.step_count >= self.max_steps
 
         return self.state, reward, done, {}
+
+    def _update_wind_velocity(self):
+        if self._wind_step_counter % self.wind_change_interval == 5 and self._wind_step_counter != 0:
+
+            # update with new wind after 5 steps
+            self._current_wind = random.uniform(0.0, 1.0)
+
+        # update counter and value
+        self.state[-1] = self._current_wind
+        self._wind_step_counter += 1
+
 
     def _compute_reward(self, state, action):
         # reward function for RL, should check this reward
