@@ -99,10 +99,10 @@ class WaterInjectionEnv(gym.Env):
         self._wind_step_counter += 1
 
 
-    def _compute_reward(self, state, action):
+    def _compute_reward(self, state, action, water_loss):
         # reward function for RL, should check this reward
         moisture = state[:-1]
-        return -np.sum((moisture - self.setpoints) ** 2) - 0.01 * np.sum(action ** 2)
+        return -np.sum((moisture - self.setpoints) ** 2) - 0.01 * np.sum(action ** 2) - 0.1*water_loss
 
     def _start_fluent_with_case(self):  # start fluent solver with correct case setup
         case_file = f"N{self.N}_H{self.H}.cas.h5"
