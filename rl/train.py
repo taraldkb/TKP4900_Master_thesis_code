@@ -38,7 +38,7 @@ def compute_returns(rewards, gamma=0.99):
 # create training agent and loop
 def train_agent(epochs=100, gamma=0.99, lr=1e-3, save_path="Save/policy.pt", log_dir="logs/reinforce"):
     env = WaterInjectionEnv(run_cfd_step)
-    policy = PolicyNet(state_dim=9, action_dim=3)
+    policy = PolicyNet(state_dim=10, action_dim=3)
     optimizer = optim.Adam(policy.parameters(), lr=lr)
     writer = SummaryWriter(log_dir=log_dir)
 

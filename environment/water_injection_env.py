@@ -43,19 +43,17 @@ class WaterInjectionEnv(gym.Env):
         self.wind_change_interval = 5
         self._wind_step_counter = 0
         self._current_wind = 0.5
+        self.setpoint = 0.5
 
         # create action space 3 actions [injection1, injection2, mass_flow]
         self.action_space = spaces.Box(low=0.0,
                                        high=1.0,
                                        shape=(3,), dtype=np.float32)
 
-        # create observation space 8 obs [8 zones, wind], value between 0-1, set propper values for zone value
-        self.observation_space = spaces.Box(low=np.zeros(9),
-                                            high=np.append(np.full(8, 15.0), np.float32(15.0)),
-                                            shape=(9,), dtype=np.float32)
-
-        # set points, static for now CHANGE LATER !!!!
-        self.setpoints = np.full(8, 0.6)
+        # create observation space 9 obs [8 zones, wind, setpoint], value between 0-1, set proper values for zone value
+        self.observation_space = spaces.Box(low=np.zeros(10),
+                                            high=np.append(np.full(8, 15.0), np.float32(15.0), np.float32(15.0)),
+                                            shape=(10,), dtype=np.float32)
 
     def reset(self):  # reset environment for new episode
         self._start_fluent_with_case()
@@ -64,7 +62,8 @@ class WaterInjectionEnv(gym.Env):
 
         # create initial state MIGHT NEED TO CHANGE [ dpm concentration X8, wind velocity]
         self._current_wind = 0.5
-        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind]])
+        self.setpoint = 0.5
+        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
         return self.state
 
     # create function for taking time step
@@ -72,6 +71,7 @@ class WaterInjectionEnv(gym.Env):
 
         # check for wind update
         self._update_wind_velocity()
+        self._update_setpoint()
 
         # Run cfd and gather observation
         next_state, water_loss = self.run_cfd_step(
@@ -83,8 +83,8 @@ class WaterInjectionEnv(gym.Env):
             self.loss_report_path
         )
 
-        reward = self._compute_reward(next_state, action, water_loss)
-        self.state = next_state
+        self.state = np.concatenate([next_state, [self.setpoint]])
+        reward = self._compute_reward(self.state, action, water_loss)
         self.step_count += 1
         done = self.step_count >= self.max_steps
 
@@ -97,13 +97,20 @@ class WaterInjectionEnv(gym.Env):
             self._current_wind = random.uniform(0.0, 1.0)
 
         # update counter and value
-        self.state[-1] = self._current_wind
+        self.state[-2] = self._current_wind
         self._wind_step_counter += 1
+
+    def _update_setpoint(self):
+        if self.step_count == 10:
+            self.setpoint = random.uniform(0.0, 1.0)
+
+        self.state[-1] = self.setpoint
 
     def _compute_reward(self, state, action, water_loss):
         # reward function for RL, should check this reward
-        moisture = state[:-1]
-        return -np.sum((moisture - self.setpoints) ** 2) - 0.01 * np.sum(action ** 2) - 0.1*water_loss
+        moisture = state[:-2]
+        sp = state[-1]
+        return -np.sum((moisture - sp) ** 2) - 0.01 * np.sum(action ** 2) - 0.1*water_loss
 
     def _start_fluent_with_case(self):  # start fluent solver with correct case setup
         case_file = f"N{self.N}_H{self.H}.cas.h5"
