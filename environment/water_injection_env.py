@@ -11,7 +11,7 @@ import random
 class WaterInjectionEnv(gym.Env):
     def __init__(self, run_cfd_step_fn, config_path="configs/design_settings.json",
                  case_dir="cases", trans_controls_path="configs/transient_control_settings.json",
-                 report_path="results/report.out"):
+                 report_path="results/report.out", loss_path= "results/water_loss.out"):
         super().__init__()
 
         # load config
@@ -26,6 +26,7 @@ class WaterInjectionEnv(gym.Env):
         self.H = self.design_params["H"]
         self.case_dir = case_dir
         self.report_path = report_path
+        self.loss_report_path = loss_path
         self.run_cfd_step = run_cfd_step_fn
         self.time_step_type = self.trans_params["type"]
         self.iter_per_timestep = self.trans_params["ipt"]
@@ -73,15 +74,16 @@ class WaterInjectionEnv(gym.Env):
         self._update_wind_velocity()
 
         # Run cfd and gather observation
-        next_state = self.run_cfd_step(
+        next_state, water_loss = self.run_cfd_step(
             self.fluent_session,
             self.state,
             action,
             self.design_params,
-            self.report_path
+            self.report_path,
+            self.loss_report_path
         )
 
-        reward = self._compute_reward(next_state, action)
+        reward = self._compute_reward(next_state, action, water_loss)
         self.state = next_state
         self.step_count += 1
         done = self.step_count >= self.max_steps
@@ -98,11 +100,10 @@ class WaterInjectionEnv(gym.Env):
         self.state[-1] = self._current_wind
         self._wind_step_counter += 1
 
-
-    def _compute_reward(self, state, action):
+    def _compute_reward(self, state, action, water_loss):
         # reward function for RL, should check this reward
         moisture = state[:-1]
-        return -np.sum((moisture - self.setpoints) ** 2) - 0.01 * np.sum(action ** 2)
+        return -np.sum((moisture - self.setpoints) ** 2) - 0.01 * np.sum(action ** 2) - 0.1*water_loss
 
     def _start_fluent_with_case(self):  # start fluent solver with correct case setup
         case_file = f"N{self.N}_H{self.H}.cas.h5"

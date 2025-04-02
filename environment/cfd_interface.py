@@ -5,10 +5,11 @@ from utils.read_report_function import *
 from utils.map_value_function import *
 
 
-def run_cfd_step(fluent_session, current_state, action, design_params, report_path):
+def run_cfd_step(fluent_session, current_state, action, design_params, report_path, water_report_path):
 
     """
     Run a step in cfd model, 2 seconds/ 20 time steps
+    :param water_report_path: path to water_loss.out file string
     :param fluent_session: Active pyfluent object
     :param current_state: current environment state array size (9, ) [concentrationX8, wind_velocity]
     :param action: MV values array size (3, ) [speed1, speed2, mass_flow]
@@ -54,11 +55,13 @@ def run_cfd_step(fluent_session, current_state, action, design_params, report_pa
     if not os.path.exists(report_path):
         raise FileNotFoundError(f"Report file could not be could: {report_path} ")
 
-    # read report
+    # read reports
     next_state = read_report(report_path)
     next_state.append(wind_velocity)
 
-    return next_state
+    water_loss = read_water_loss_file(water_report_path)
+
+    return next_state, water_loss
 
 
 
