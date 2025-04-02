@@ -4,6 +4,7 @@ import os
 from utils.read_report_function import *
 from utils.map_value_function import *
 
+
 def run_cfd_step(fluent_session, current_state, action, design_params, report_path):
 
     """
@@ -55,6 +56,7 @@ def run_cfd_step(fluent_session, current_state, action, design_params, report_pa
 
     # read report
     next_state = read_report(report_path)
+    next_state.append(wind_velocity)
 
     return next_state
 
