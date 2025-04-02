@@ -21,7 +21,7 @@ def run_cfd_step(fluent_session, current_state, action, design_params, report_pa
     solver = fluent_session.solver
 
     # Unpack state and manipulated variables
-    wind_velocity = current_state[-1]
+    wind_velocity = current_state[-2]
     speed1, speed2, mass_flow = action
     N = design_params["N"]
 
