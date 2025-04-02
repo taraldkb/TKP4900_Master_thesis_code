@@ -63,7 +63,7 @@ class WaterInjectionEnv(gym.Env):
         # create initial state MIGHT NEED TO CHANGE [ dpm concentration X8, wind velocity]
         self._current_wind = 0.5
         self.setpoint = 0.5
-        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind]], [self.setpoint])
+        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
         return self.state
 
     # create function for taking time step
@@ -83,7 +83,7 @@ class WaterInjectionEnv(gym.Env):
             self.loss_report_path
         )
 
-        self.state = np.concatenate(next_state, [self.setpoint])
+        self.state = np.concatenate([next_state, [self.setpoint]])
         reward = self._compute_reward(self.state, action, water_loss)
         self.step_count += 1
         done = self.step_count >= self.max_steps
@@ -101,7 +101,9 @@ class WaterInjectionEnv(gym.Env):
         self._wind_step_counter += 1
 
     def _update_setpoint(self):
-        self.setpoint = 1
+        if self.step_count == 10:
+            self.setpoint = random.uniform(0.0, 1.0)
+
         self.state[-1] = self.setpoint
 
     def _compute_reward(self, state, action, water_loss):
