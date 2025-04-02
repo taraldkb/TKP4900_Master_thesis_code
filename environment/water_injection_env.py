@@ -49,10 +49,10 @@ class WaterInjectionEnv(gym.Env):
                                        high=1.0,
                                        shape=(3,), dtype=np.float32)
 
-        # create observation space 8 obs [8 zones, wind], value between 0-1, set propper values for zone value
-        self.observation_space = spaces.Box(low=np.zeros(9),
-                                            high=np.append(np.full(8, 15.0), np.float32(15.0)),
-                                            shape=(9,), dtype=np.float32)
+        # create observation space 9 obs [8 zones, wind, setpoint], value between 0-1, set proper values for zone value
+        self.observation_space = spaces.Box(low=np.zeros(10),
+                                            high=np.append(np.full(8, 15.0), np.float32(15.0), np.float32(15.0)),
+                                            shape=(10,), dtype=np.float32)
 
         # set points, static for now CHANGE LATER !!!!
         self.setpoints = np.full(8, 0.6)
@@ -99,6 +99,9 @@ class WaterInjectionEnv(gym.Env):
         # update counter and value
         self.state[-1] = self._current_wind
         self._wind_step_counter += 1
+
+    def _update_setpoint(self):
+        self.setpoint = 1
 
     def _compute_reward(self, state, action, water_loss):
         # reward function for RL, should check this reward
