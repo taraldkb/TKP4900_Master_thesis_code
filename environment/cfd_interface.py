@@ -42,7 +42,7 @@ def run_cfd_step(fluent_session, current_state, action, design_params, report_pa
 
     if N == 2:
         try:
-            injection2 = solver.setup.models.discrete_phase.injections["injection1"]
+            injection2 = solver.setup.models.discrete_phase.injections["injection2"]
             injection2.properties.velocity = map_value(speed2, 0, 20)
             injection2.properties.mass_flow_rate = map_value(mass_flow, 50, 500)
         except Exception as e:
