@@ -25,7 +25,7 @@ def read_report(file_path):
                     data[i].append(float(holder[i]))
 
                 for i in range(len(data)):
-                    data[i] = st.mean(data[i][-10])
+                    data[i] = st.mean(data[i][-10:])
 
         return data
 
