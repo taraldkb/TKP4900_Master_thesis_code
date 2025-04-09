@@ -53,9 +53,9 @@ class WaterInjectionEnv(gym.Env):
                                        high=1.0,
                                        shape=(3,), dtype=np.float32)
 
-        # create observation space 9 obs [8 zones, wind, setpoint], value between 0-1, set proper values for zone value
+        # create observation space 10 obs [8 zones, wind, setpoint], value between 0-1, set proper values for zone value
         self.observation_space = spaces.Box(low=np.zeros(10),
-                                            high=np.append(np.full(8, 15.0), np.float32(15.0), np.float32(15.0)),
+                                            high=np.append(np.full(8, 100), np.float32(1.0), np.float32(50)),
                                             shape=(10,), dtype=np.float32)
 
     def reset(self):  # reset environment for new episode
