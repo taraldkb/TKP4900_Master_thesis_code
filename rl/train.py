@@ -68,7 +68,7 @@ def normalize(x):
 def train_agent():
     writer = SummaryWriter(log_dir=CONFIG["log_dir"])
 
-    env = WaterInjectionEnv(run_cfd_step())
+    env = WaterInjectionEnv(run_cfd_step)
     policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
     value = ValueNet(CONFIG["state_dim"], CONFIG["hidden_size"])
 
@@ -132,7 +132,26 @@ def train_agent():
     print("Training complete. Best reward:", best_reward)
 
 
+# create tester
+def test_agent(episodes=5, policy_path=CONFIG["save_path"]):
+    env = WaterInjectionEnv(run_cfd_step)
+    policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
+    policy.load_state_dict(torch.load(policy_path))
+    policy.eval()
 
+    for ep in range(episodes):
+        state = env.reset()
+        total_reward = 0
+        done = False
+
+        while not done:
+            with torch.no_grad():
+                state_tensor = torch.tensor(state, dtype=torch.float32)
+                mean, _ = policy(state_tensor)
+                action = mean.numpy()
+            state, reward, done, _ = env.step(action)
+            total_reward += reward
+        print(f"[Test] Episode {ep + 1}: reward = {total_reward:.2f}")
 
 
 
