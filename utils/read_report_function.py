@@ -1,7 +1,7 @@
 import statistics as st
 
 
-def read_report(file_path):
+def read_concentrations(file_path):
 
     """
     Function to read report.out file and return cleaned and manipulated data
@@ -19,13 +19,13 @@ def read_report(file_path):
 
             for line in lines:
                 holder = line.strip().split()   # remove whitespace and split into a list
-                holder = holder[1:]  # remove time step counter
+                holder = holder[2:]  # remove time step counter
 
                 for i in range(len(holder)):
                     data[i].append(float(holder[i]))
 
-                for i in range(len(data)):
-                    data[i] = st.mean(data[i][-10:])
+            for j in range(len(data)):
+                data[j] = st.mean(data[j][-10:])
 
         return data
 
@@ -51,7 +51,7 @@ def read_single_data_file(file_path):
                 holder = line.strip().split()
                 data.append(float(holder[-1]))
 
-            data = st.mean(data)
+            data = st.mean(data[-10:])
 
             return data
     except FileNotFoundError:
