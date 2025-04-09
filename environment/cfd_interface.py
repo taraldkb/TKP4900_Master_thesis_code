@@ -56,7 +56,7 @@ def run_cfd_step(fluent_session, current_state, action, design_params, report_pa
         raise FileNotFoundError(f"Report file could not be could: {report_path} ")
 
     # read reports
-    next_state = read_report(report_path)
+    next_state = read_concentrations(report_path)
     next_state.append(wind_velocity)
 
     water_loss = read_single_data_file(water_report_path)

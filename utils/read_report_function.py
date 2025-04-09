@@ -1,7 +1,7 @@
 import statistics as st
 
 
-def read_report(file_path):
+def read_concentrations(file_path):
 
     """
     Function to read report.out file and return cleaned and manipulated data
