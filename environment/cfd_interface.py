@@ -59,7 +59,7 @@ def run_cfd_step(fluent_session, current_state, action, design_params, report_pa
     next_state = read_report(report_path)
     next_state.append(wind_velocity)
 
-    water_loss = read_water_loss_file(water_report_path)
+    water_loss = read_single_data_file(water_report_path)
 
     return next_state, water_loss
 

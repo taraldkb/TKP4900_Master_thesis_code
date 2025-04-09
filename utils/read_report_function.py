@@ -33,7 +33,7 @@ def read_report(file_path):
         raise FileNotFoundError(f"Could not read file: {file_path}")
 
 
-def read_water_loss_file(file_path):
+def read_single_data_file(file_path):
     """
     Read .out file containing water loss data and return cleansed  and manipulated datadata
     :param file_path: file path to water loss file location str
