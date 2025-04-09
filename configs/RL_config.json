@@ -7,6 +7,6 @@
     "lr_policy": 5e-4,
     "lr_value": 1e-3,
     "log_dir": "logs/reinforce",
-    "save_path": "models/best_policy.pt",
+    "save_path": "Save/best_policy.pt",
     "clip_actions": true
 }
