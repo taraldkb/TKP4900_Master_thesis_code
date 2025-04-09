@@ -122,15 +122,15 @@ class WaterInjectionEnv(gym.Env):
         # create fluent session and load correct case
         self.fluent_session = launch_fluent(mode="solver", precision="double", processor_count=8,
                                             dimension=pyfluent.Dimension.TWO)
-        solver = self.fluent_session.solver
-        solver.file.read(file_type="case", file_name=case_path)
+
+        self.fluent_session.file.read(file_type="case", file_name=case_path)
 
         # set transient simulation controls
-        trans_controls = solver.solution.run_calculation.transient_controls
+        trans_controls = self.fluent_session.solution.run_calculation.transient_controls
         trans_controls.type = self.time_step_type
         trans_controls.max_iter_per_time_step = self.iter_per_timestep
         trans_controls.time_step_size = self.time_step_size
         trans_controls.time_step_count = self.time_step_total
 
         # initialize case with hybrid initialization
-        solver.solution.initialization.hybrid_initialize()
+        self.fluent_session.solution.initialization.hybrid_initialize()
