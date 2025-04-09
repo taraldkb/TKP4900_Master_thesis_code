@@ -6,12 +6,14 @@ import json
 import ansys.fluent.core as pyfluent
 from ansys.fluent.core import launch_fluent
 import random
+import time
 
 
 class WaterInjectionEnv(gym.Env):
     def __init__(self, run_cfd_step_fn, config_path="configs/design_settings.json",
                  case_dir="cases", trans_controls_path="configs/transient_control_settings.json",
-                 report_path="results/report.out", loss_path= "results/water_loss.out"):
+                 report_path="concentration.out", loss_path="water_loss.out",
+                 water_path="water_usage.out"):
         super().__init__()
 
         # load config
@@ -27,6 +29,7 @@ class WaterInjectionEnv(gym.Env):
         self.case_dir = case_dir
         self.report_path = report_path
         self.loss_report_path = loss_path
+        self.water_usage_report_path = water_path
         self.run_cfd_step = run_cfd_step_fn
         self.time_step_type = self.trans_params["type"]
         self.iter_per_timestep = self.trans_params["ipt"]
@@ -113,6 +116,31 @@ class WaterInjectionEnv(gym.Env):
         return -np.sum((moisture - sp) ** 2) - 0.01 * np.sum(action ** 2) - 0.1*water_loss
 
     def _start_fluent_with_case(self):  # start fluent solver with correct case setup
+
+        # clean up files between sessions
+        if os.path.exists(self.report_path):
+            for _ in range(10):
+                try:
+                    os.remove(self.report_path)
+                    break
+                except PermissionError:
+                    time.sleep(0.5)
+
+        if os.path.exists(self.water_usage_report_path):
+            for _ in range(10):
+                try:
+                    os.remove(self.water_usage_report_path)
+                    break
+                except PermissionError:
+                    time.sleep(0.5)
+        if os.path.exists(self.loss_report_path):
+            for _ in range(10):
+                try:
+                    os.remove(self.loss_report_path)
+                    break
+                except PermissionError:
+                    time.sleep(0.5)
+
         case_file = f"N{self.N}_H{self.H}.cas.h5"
         case_path = os.path.join(self.case_dir, case_file)
 
