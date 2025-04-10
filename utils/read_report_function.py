@@ -1,4 +1,5 @@
 import statistics as st
+import numpy as np
 
 
 def read_concentrations(file_path):
@@ -27,7 +28,7 @@ def read_concentrations(file_path):
             for j in range(len(data)):
                 data[j] = st.mean(data[j][-10:])
 
-        return data
+        return np.array(data)
 
     except FileNotFoundError:
         raise FileNotFoundError(f"Could not read file: {file_path}")
