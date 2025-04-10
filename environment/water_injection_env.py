@@ -31,15 +31,15 @@ class WaterInjectionEnv(gym.Env):
         self.loss_report_path = loss_path
         self.water_usage_report_path = water_path
         self.run_cfd_step = run_cfd_step_fn
-        self.time_step_type = self.trans_params["type"]
-        self.iter_per_timestep = self.trans_params["ipt"]
-        self.time_step_size = self.trans_params["step_size"]
-        self.time_step_total = self.trans_params["total_steps"]
 
         # create simulation variables
         self.fluent_session = None
         self.max_steps = 20
         self.step_count = 0
+        self.time_step_type = self.trans_params["type"]
+        self.iter_per_timestep = self.trans_params["ipt"]
+        self.time_step_size = self.trans_params["step_size"]
+        self.time_step_total = self.trans_params["total_steps"]
         self.state = None
 
         # create wind tracking parameters
