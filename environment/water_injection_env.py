@@ -31,22 +31,26 @@ class WaterInjectionEnv(gym.Env):
         self.loss_report_path = loss_path
         self.water_usage_report_path = water_path
         self.run_cfd_step = run_cfd_step_fn
-        self.time_step_type = self.trans_params["type"]
-        self.iter_per_timestep = self.trans_params["ipt"]
-        self.time_step_size = self.trans_params["step_size"]
-        self.time_step_total = self.trans_params["total_steps"]
 
         # create simulation variables
         self.fluent_session = None
         self.max_steps = 20
         self.step_count = 0
+        self.time_step_type = self.trans_params["type"]
+        self.iter_per_timestep = self.trans_params["ipt"]
+        self.time_step_size = self.trans_params["step_size"]
+        self.time_step_total = self.trans_params["total_steps"]
         self.state = None
 
         # create wind tracking parameters
         self.wind_change_interval = 5
         self._wind_step_counter = 0
         self._current_wind = 0.5
-        self.setpoint = 0.5
+        self.setpoint = 20.0
+
+        # create initall state and actions for intializing system
+        self.initial_actions = np.array([0.25, 0.25, 0.49494949])
+        self.state = self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
 
         # create action space 3 actions [injection1, injection2, mass_flow]
         self.action_space = spaces.Box(low=0.0,
@@ -62,11 +66,8 @@ class WaterInjectionEnv(gym.Env):
         self._start_fluent_with_case()
         self.step_count = 0
         self._wind_step_counter = 0
+        self.get_initial_state()
 
-        # create initial state MIGHT NEED TO CHANGE [ dpm concentration X8, wind velocity]
-        self._current_wind = 0.5
-        self.setpoint = 0.5
-        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
         return self.state
 
     # create function for taking time step
@@ -117,6 +118,11 @@ class WaterInjectionEnv(gym.Env):
 
     def _start_fluent_with_case(self):  # start fluent solver with correct case setup
 
+        # remove active sessions
+        if self.fluent_session is not None:
+            self.fluent_session.exit()
+            self.fluent_session = None
+
         # clean up files between sessions
         if os.path.exists(self.report_path):
             for _ in range(10):
@@ -162,3 +168,16 @@ class WaterInjectionEnv(gym.Env):
 
         # initialize case with hybrid initialization
         self.fluent_session.solution.initialization.hybrid_initialize()
+
+    def get_initial_state(self):
+        initial_state, _ = self.run_cfd_step(
+            self.fluent_session,
+            self.state,
+            self.initial_actions,
+            self.design_params,
+            self.report_path,
+            self.loss_report_path
+        )
+
+        self.state = np.concatenate([initial_state, [self.setpoint]])
+
