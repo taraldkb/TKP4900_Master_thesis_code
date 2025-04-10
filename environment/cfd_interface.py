@@ -11,7 +11,7 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
     Run a step in cfd model, 2 seconds/ 20 time steps
     :param water_report_path: path to water_loss.out file string
     :param solver: Active pyfluent session object
-    :param current_state: current environment state array size (9, ) [concentrationX8, wind_velocity]
+    :param current_state: current environment state array size (9, ) [concentrationX8, wind_velocity, setpoint]
     :param action: MV values array size (3, ) [speed1, speed2, mass_flow]
     :param design_params: design parameteres hight H and injection points N {'N': 1 or 2, 'H': 50/75/100}
     :param report_path: path to report.out file string
