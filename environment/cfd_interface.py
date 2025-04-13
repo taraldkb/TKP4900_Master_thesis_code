@@ -25,7 +25,7 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
 
     # Set boundary conditions
     try:
-        solver.setup.boundary_conditions.velocity_inlet["wind"].momentum.value = map_value(wind_velocity(1.0, 20.0))
+        solver.setup.boundary_conditions.velocity_inlet["wind"].momentum.value = map_value(wind_velocity,1.0, 20.0)
 
     except Exception as e:
         print(f"[WARNING] Could not set wind velocity: {e}")
