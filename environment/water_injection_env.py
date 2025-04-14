@@ -64,6 +64,8 @@ class WaterInjectionEnv(gym.Env):
 
     def reset(self):  # reset environment for new episode
         self._start_fluent_with_case()
+        self._current_wind = 0.5
+        self.setpoint = 20.0
         self.step_count = 0
         self._wind_step_counter = 0
         self.get_initial_state()
