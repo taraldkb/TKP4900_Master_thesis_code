@@ -55,6 +55,9 @@ class WaterInjectionEnv(gym.Env):
             [20, 15, 10, 9, 8, 5, 5, 10, 10, 15],
             [20, 20, 10, 10, 10, 10, 30, 30, 30, 30]
         ]
+        self.wind_profile = None
+        self.sp_profile = None
+
         self._current_wind = 0.5
         self.setpoint = 20.0
 
@@ -78,6 +81,7 @@ class WaterInjectionEnv(gym.Env):
         self._current_wind = 0.5
         self.setpoint = 20.0
         self.step_count = 0
+        self._get_profiles()
         self._get_initial_state()
 
         return self.state
@@ -87,7 +91,6 @@ class WaterInjectionEnv(gym.Env):
 
         # check for wind update
         self._update_variables()
-
 
         # Run cfd and gather observation
         next_state, water_loss = self.run_cfd_step(
@@ -107,9 +110,11 @@ class WaterInjectionEnv(gym.Env):
         return self.state, reward, done, {}
 
     def _update_variables(self):
+        wind = self.wind_profile[self.step_count]
+        sp = self.sp_profile[self.step_count]
 
-
-
+        self.state[-2] = wind
+        self.state[-1] = sp
 
     def _compute_reward(self, state, action, water_loss):
         # reward function for RL, should check this reward
@@ -181,4 +186,11 @@ class WaterInjectionEnv(gym.Env):
         )
 
         self.state = np.concatenate([initial_state, [self.setpoint]])
+
+    def _get_profiles(self):
+        rand_int_wind = random.randint(0, 3)
+        rand_int_sp = random.randint(0, 3)
+
+        self.wind_profile = self.wind_profile_lib[rand_int_wind]
+        self.sp_profile = self.sp_profile_lib[rand_int_sp]
 
