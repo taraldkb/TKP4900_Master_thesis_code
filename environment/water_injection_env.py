@@ -34,7 +34,7 @@ class WaterInjectionEnv(gym.Env):
 
         # create simulation variables
         self.fluent_session = None
-        self.max_steps = 20
+        self.max_steps = 10
         self.step_count = 0
         self.time_step_type = self.trans_params["type"]
         self.iter_per_timestep = self.trans_params["ipt"]
@@ -42,11 +42,25 @@ class WaterInjectionEnv(gym.Env):
         self.time_step_total = self.trans_params["total_steps"]
         self.state = None
 
-        # create wind tracking parameters
-        self.wind_change_interval = 5
-        self._wind_step_counter = 0
+        # set variable values
+        self.wind_profile_lib = [
+            [0.5, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75, 0.75, 0.75, 0.75],
+            [0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25],
+            [0.5, 0.5, 0.75, 0.75, 0.5, 0.5, 0.75, 0.75, 0.85, 0.9],
+            [0.5, 0.25, 0.5, 0.75, 0.5, 0.5, 0.25, 0.5, 0.75, 0.5,]
+        ]
+        self.sp_profile_lib = [
+            [20, 20, 20, 20, 20, 15, 15, 15, 15, 15],
+            [20, 20, 20, 20, 20, 30, 30, 30, 30, 30],
+            [20, 15, 10, 9, 8, 5, 5, 10, 10, 15],
+            [20, 20, 10, 10, 10, 10, 30, 30, 30, 30]
+        ]
+        self.wind_profile = None
+        self.sp_profile = None
+
         self._current_wind = 0.5
         self.setpoint = 20.0
+
 
         # create initall state and actions for intializing system
         self.initial_actions = np.array([0.25, 0.25, 0.49494949])
@@ -64,9 +78,11 @@ class WaterInjectionEnv(gym.Env):
 
     def reset(self):  # reset environment for new episode
         self._start_fluent_with_case()
+        self._current_wind = 0.5
+        self.setpoint = 20.0
         self.step_count = 0
-        self._wind_step_counter = 0
-        self.get_initial_state()
+        self._get_profiles()
+        self._get_initial_state()
 
         return self.state
 
@@ -74,8 +90,7 @@ class WaterInjectionEnv(gym.Env):
     def step(self, action):
 
         # check for wind update
-        self._update_wind_velocity()
-        self._update_setpoint()
+        self._update_variables()
 
         # Run cfd and gather observation
         next_state, water_loss = self.run_cfd_step(
@@ -94,21 +109,12 @@ class WaterInjectionEnv(gym.Env):
 
         return self.state, reward, done, {}
 
-    def _update_wind_velocity(self):
-        if self._wind_step_counter % self.wind_change_interval == 5 and self._wind_step_counter != 0:
+    def _update_variables(self):
+        wind = self.wind_profile[self.step_count]
+        sp = self.sp_profile[self.step_count]
 
-            # update with new wind after 5 steps
-            self._current_wind = random.uniform(0.0, 1.0)
-
-        # update counter and value
-        self.state[-2] = self._current_wind
-        self._wind_step_counter += 1
-
-    def _update_setpoint(self):
-        if self.step_count == 10:
-            self.setpoint = random.uniform(0.0, 1.0)
-
-        self.state[-1] = self.setpoint
+        self.state[-2] = wind
+        self.state[-1] = sp
 
     def _compute_reward(self, state, action, water_loss):
         # reward function for RL, should check this reward
@@ -169,7 +175,7 @@ class WaterInjectionEnv(gym.Env):
         # initialize case with hybrid initialization
         self.fluent_session.solution.initialization.hybrid_initialize()
 
-    def get_initial_state(self):
+    def _get_initial_state(self):
         initial_state, _ = self.run_cfd_step(
             self.fluent_session,
             self.state,
@@ -180,4 +186,11 @@ class WaterInjectionEnv(gym.Env):
         )
 
         self.state = np.concatenate([initial_state, [self.setpoint]])
+
+    def _get_profiles(self):
+        rand_int_wind = random.randint(0, 3)
+        rand_int_sp = random.randint(0, 3)
+
+        self.wind_profile = self.wind_profile_lib[rand_int_wind]
+        self.sp_profile = self.sp_profile_lib[rand_int_sp]
 
