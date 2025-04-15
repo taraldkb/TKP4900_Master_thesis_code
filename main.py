@@ -1,3 +1,3 @@
-from train import train_agent
+from rl.train import train_agent
 
 train_agent()
