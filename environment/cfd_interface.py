@@ -55,7 +55,7 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
 
     # read reports
     next_state = read_concentrations(report_path)
-    next_state.append(wind_velocity)
+    next_state= np.append(next_state, wind_velocity)
 
     water_loss = read_single_data_file(water_report_path)
 

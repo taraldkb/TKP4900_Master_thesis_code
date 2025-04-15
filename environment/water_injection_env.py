@@ -111,10 +111,10 @@ class WaterInjectionEnv(gym.Env):
 
     def _update_variables(self):
         wind = self.wind_profile[self.step_count]
-        sp = self.sp_profile[self.step_count]
+        self.setpoint = self.sp_profile[self.step_count]
 
         self.state[-2] = wind
-        self.state[-1] = sp
+        self.state[-1] = self.setpoint
 
     def _compute_reward(self, state, action, water_loss):
         # reward function for RL, should check this reward
