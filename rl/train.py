@@ -94,7 +94,7 @@ def train_agent():
             log_prob = dist.log_prob(action).sum()
             value_est = value(state_tensor)
 
-            next_state, reward, done, _ = env.step(action.detach.numpy())
+            next_state, reward, done, _ = env.step(action.detach().numpy())
 
             log_probs.append(log_prob)
             rewards.append(reward)
