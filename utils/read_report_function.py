@@ -57,3 +57,53 @@ def read_single_data_file(file_path):
             return data
     except FileNotFoundError:
         raise FileNotFoundError(f"Could not read file: {file_path}")
+
+def plot_conc(file_path, run):
+    data = [[] for i in range(8)]
+    time = []
+    try:
+        with open(file_path, 'r') as f:
+            lines = f.readlines()
+            lines = lines[3:]
+
+        for line in lines:
+            holder = line.strip().split()
+            time.append(float(holder[1]))
+            holder = holder[2:]
+
+            for i in range(len(holder)):
+                data[i].append(float(holder[i]))
+
+
+        for i in range(len(data)):
+            plt.plot(time,data[i], label = f" wall {i+1}")
+        plt.title(f"concentrations run: {run}")
+        plt.legend()
+        plt.show()
+
+
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File not found: {file_path} ")
+
+def plot_water(file_path, run):
+    data = []
+    time = []
+    try:
+        with open(file_path, 'r') as f:
+            lines = f.readlines()
+            lines = lines[3:]
+
+        for line in lines:
+            holder = line.strip().split()
+            data.append(round(float(holder[-1]),2))
+            time.append(float(holder[1]))
+
+        plt.plot(time,data)
+        plt.title(f"water usage run: {run}")
+        plt.show()
+        print(data)
+
+
+
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File not found: {file_path} ")

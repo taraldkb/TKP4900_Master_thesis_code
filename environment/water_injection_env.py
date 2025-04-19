@@ -7,6 +7,7 @@ import ansys.fluent.core as pyfluent
 from ansys.fluent.core import launch_fluent
 import random
 import time
+from utils.read_report_function import *
 
 
 class WaterInjectionEnv(gym.Env):
@@ -184,6 +185,9 @@ class WaterInjectionEnv(gym.Env):
             self.report_path,
             self.loss_report_path
         )
+
+        plot_conc(self.report_path, "initial_state")
+        plot_water(self.water_usage_report_path, "initial_state")
 
         self.state = np.concatenate([initial_state, [self.setpoint]])
 
