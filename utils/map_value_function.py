@@ -6,4 +6,4 @@ def map_value(value, low, high):
     :param low: the lowest value in maping set
     :param high: the highest value in maping set
     """
-    return low + (high - low)*value
+    return float(low + (high - low)*value)
