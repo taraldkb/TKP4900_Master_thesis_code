@@ -131,28 +131,23 @@ class WaterInjectionEnv(gym.Env):
             self.fluent_session = None
 
         # clean up files between sessions
-        if os.path.exists(self.report_path):
-            for _ in range(10):
-                try:
-                    os.remove(self.report_path)
-                    break
-                except PermissionError:
-                    time.sleep(0.5)
+        while os.path.exists(self.report_path):
+            try:
+                os.remove(self.report_path)
+            except PermissionError:
+                time.sleep(0.5)
 
-        if os.path.exists(self.water_usage_report_path):
-            for _ in range(10):
-                try:
-                    os.remove(self.water_usage_report_path)
-                    break
-                except PermissionError:
-                    time.sleep(0.5)
-        if os.path.exists(self.loss_report_path):
-            for _ in range(10):
-                try:
-                    os.remove(self.loss_report_path)
-                    break
-                except PermissionError:
-                    time.sleep(0.5)
+        while os.path.exists(self.water_usage_report_path):
+            try:
+                os.remove(self.water_usage_report_path)
+            except PermissionError:
+                time.sleep(0.5)
+
+        while os.path.exists(self.loss_report_path):
+            try:
+                os.remove(self.loss_report_path)
+            except PermissionError:
+                time.sleep(0.5)
 
         case_file = f"N{self.N}_H{self.H}.cas.h5"
         case_path = os.path.join(self.case_dir, case_file)
