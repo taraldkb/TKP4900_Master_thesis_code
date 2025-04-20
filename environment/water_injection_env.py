@@ -82,7 +82,7 @@ class WaterInjectionEnv(gym.Env):
         self._start_fluent_with_case()
         self._current_wind = 0.5
         self.setpoint = 20.0
-        self.epiosde_count += 1
+        self.episode_count += 1
         self.step_count = 0
         self._get_profiles()
         self._get_initial_state()
@@ -183,8 +183,8 @@ class WaterInjectionEnv(gym.Env):
             self.loss_report_path
         )
 
-        plot_conc(self.report_path, self.epiosde_count)
-        plot_water(self.water_usage_report_path, self.epiosde_count)
+        plot_conc(self.report_path, self.episode_count)
+        plot_water(self.water_usage_report_path, self.episode_count)
 
         self.state = np.concatenate([initial_state, [self.setpoint]])
 
@@ -194,4 +194,14 @@ class WaterInjectionEnv(gym.Env):
 
         self.wind_profile = self.wind_profile_lib[rand_int_wind]
         self.sp_profile = self.sp_profile_lib[rand_int_sp]
+
+    def testing_reset(self):
+        self._start_fluent_with_case()
+        self._current_wind = 0.5
+        self.setpoint = 20.0
+        self.step_count = 0
+        self._get_initial_state()
+
+        return self.state
+
 

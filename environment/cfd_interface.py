@@ -25,7 +25,7 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
 
     # Set boundary conditions
     try:
-        solver.setup.boundary_conditions.velocity_inlet["wind"].momentum.velocity.value = map_value(wind_velocity,1.0, 20.0)
+        solver.setup.boundary_conditions.velocity_inlet["wind"].momentum.velocity.value = map_value(wind_velocity, 0.0, 20.0)
 
     except Exception as e:
         print(f"[WARNING] Could not set wind velocity: {e}")
@@ -34,7 +34,7 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
     try:
         injection1 = solver.setup.models.discrete_phase.injections["injection1"]
         injection1.initial_values.velocity.magnitude = map_value(speed1, 0.0, 20.0)
-        injection1.initial_values.mass_flow_rate.total_flow_rate = map_value(mass_flow, 1.0, 100.0)
+        injection1.initial_values.mass_flow_rate.total_flow_rate = map_value(mass_flow, 0.0, 100.0)
     except Exception as e:
         print(f"[WARNING] Could not update injection1: {e}")
 
@@ -42,7 +42,7 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
         try:
             injection2 = solver.setup.models.discrete_phase.injections["injection2"]
             injection2.initial_values.velocity.magnitude = map_value(speed2, 0.0, 20.0)
-            injection2.initial_values.mass_flow_rate.total_flow_rate = map_value(mass_flow, 1.0, 100.0)
+            injection2.initial_values.mass_flow_rate.total_flow_rate = map_value(mass_flow, 0.0, 100.0)
         except Exception as e:
             print(f"[WARNING] Could not update injection2: {e}")
 
@@ -55,7 +55,7 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
 
     # read reports
     next_state = read_concentrations(report_path)
-    next_state= np.append(next_state, wind_velocity)
+    next_state = np.append(next_state, wind_velocity)
 
     water_loss = read_single_data_file(water_report_path)
 

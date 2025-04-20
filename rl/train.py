@@ -134,13 +134,20 @@ def train_agent():
 
 
 # create tester
-def test_agent(episodes=5, policy_path=CONFIG["save_path"]):
+def test_agent(policy_path=CONFIG["save_path"]):
     env = WaterInjectionEnv(run_cfd_step)
     policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
     policy.load_state_dict(torch.load(policy_path))
     policy.eval()
 
-    for ep in range(episodes):
+    wind_profiles_lib = [[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+                         [0.5, 0.95, 0.95, 0.95, 0.95, 0.2, 0.2, 0.2, 0.2, 0.2],
+                         [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 0.8]]
+    sp_profiles_lib = [[20.0, 25.0, 25.0, 25.0, 30.0, 30.0, 10.0, 10.0, 10.0, 10.0],
+                       [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0],
+                       [20.0, 25.0, 30.0, 30.0,  30.0, 30.0, 30.0, 30.0, 30.0, 30.0]]
+
+    for ep in range(3):
         state = env.reset()
         total_reward = 0
         done = False
