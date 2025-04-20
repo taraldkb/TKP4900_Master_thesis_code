@@ -57,7 +57,8 @@ def compute_returns(rewards, gamma):
     for r in reversed(rewards):
         G = r + gamma * G
         returns.insert(0, G)
-        return torch.tensor(returns, dtype=torch.float32)
+
+    return torch.tensor(returns, dtype=torch.float32)
 
 
 def normalize(x):
