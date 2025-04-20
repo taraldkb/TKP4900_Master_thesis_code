@@ -42,6 +42,7 @@ class WaterInjectionEnv(gym.Env):
         self.time_step_size = self.trans_params["step_size"]
         self.time_step_total = self.trans_params["total_steps"]
         self.state = None
+        self.epiosde_count = 0
 
         # set variable values
         self.wind_profile_lib = [
@@ -81,6 +82,7 @@ class WaterInjectionEnv(gym.Env):
         self._start_fluent_with_case()
         self._current_wind = 0.5
         self.setpoint = 20.0
+        self.epiosde_count += 1
         self.step_count = 0
         self._get_profiles()
         self._get_initial_state()
@@ -181,8 +183,8 @@ class WaterInjectionEnv(gym.Env):
             self.loss_report_path
         )
 
-        plot_conc(self.report_path, "initial_state")
-        plot_water(self.water_usage_report_path, "initial_state")
+        plot_conc(self.report_path, self.epiosde_count)
+        plot_water(self.water_usage_report_path, self.epiosde_count)
 
         self.state = np.concatenate([initial_state, [self.setpoint]])
 
