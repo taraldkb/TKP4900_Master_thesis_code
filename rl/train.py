@@ -196,10 +196,15 @@ def continue_train_agent(policy_path, episodes=100):
         print(
             f"Ep {episode + 1}: Reward={total_reward:.2f}, PolicyLoss={policy_loss.item():.3f}, "
             f"ValueLoss={value_loss.item():.3f}")
-
-        if total_reward > best_reward and episode > 2:
+        if episode == 0:
             best_reward = total_reward
-            torch.save(policy.state_dict(), policy_path)
+        elif episode <= 2:
+            if total_reward > best_reward:
+                best_reward = total_reward
+        else:
+            if total_reward > best_reward:
+                best_reward = total_reward
+                torch.save(policy.state_dict(), policy_path)
     writer.close()
     print("Training complete. Best reward:", best_reward)
 
