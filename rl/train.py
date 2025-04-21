@@ -9,6 +9,9 @@ import numpy as np
 import json
 from environment.water_injection_env import WaterInjectionEnv
 from environment.cfd_interface import run_cfd_step
+from utils.map_value_function import *
+from utils.read_report_function import *
+import matplotlib.pyplot as plt
 
 # Load config
 with open("configs/RL_config.json", "r") as f:
@@ -134,24 +137,53 @@ def train_agent():
 
 
 # create tester
-def test_agent(episodes=5, policy_path=CONFIG["save_path"]):
+def test_agent(policy_path=CONFIG["save_path"]):
     env = WaterInjectionEnv(run_cfd_step)
     policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
     policy.load_state_dict(torch.load(policy_path))
     policy.eval()
 
-    for ep in range(episodes):
-        state = env.reset()
+    wind_profiles_lib = [[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+                         [0.5, 0.95, 0.95, 0.95, 0.95, 0.2, 0.2, 0.2, 0.2, 0.2],
+                         [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 0.8]]
+    sp_profiles_lib = [[20.0, 25.0, 25.0, 25.0, 30.0, 30.0, 10.0, 10.0, 10.0, 10.0],
+                       [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0],
+                       [20.0, 25.0, 30.0, 30.0,  30.0, 30.0, 30.0, 30.0, 30.0, 30.0]]
+
+    for ep in range(3):
+        wind_profile = wind_profiles_lib[ep]
+        sp_profile = sp_profiles_lib[ep]
+        injection1 = []
+        injection2 = []
+        mass = []
+        state = env.testing_reset()
         total_reward = 0
+        total_rewards = []
+        rewards = []
         done = False
+        counter = 0
+
 
         while not done:
             with torch.no_grad():
                 state_tensor = torch.tensor(state, dtype=torch.float32)
                 mean, _ = policy(state_tensor)
                 action = mean.numpy()
-            state, reward, done, _ = env.step(action)
+
+                # save actions for plotting
+                injection1.append(map_value(action[0], 0, 20))
+                injection2.append(map_value(action[1], 0, 20))
+                mass.append(map_value(action[2], 0, 100))
+
+            state, reward, done, _ = env.test_step(action, wind_profile[counter], sp_profile[counter])
             total_reward += reward
+
+            # save reward and state for plotting
+            total_rewards.append(total_reward)
+            rewards.append(reward)
+            counter += 1
+        plot_conc("concentration.out", ep)
+
         print(f"[Test] Episode {ep + 1}: reward = {total_reward:.2f}")
 
 
