@@ -42,7 +42,7 @@ class WaterInjectionEnv(gym.Env):
         self.time_step_size = self.trans_params["step_size"]
         self.time_step_total = self.trans_params["total_steps"]
         self.state = None
-        self.epiosde_count = 0
+        self.episode_count = 0
 
         # set variable values
         self.wind_profile_lib = [
