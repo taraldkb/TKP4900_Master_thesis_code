@@ -63,7 +63,6 @@ class WaterInjectionEnv(gym.Env):
         self._current_wind = 0.5
         self.setpoint = 20.0
 
-
         # create initall state and actions for intializing system
         self.initial_actions = np.array([0.25, 0.25, 0.49494949])
         self.state = self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
@@ -92,9 +91,6 @@ class WaterInjectionEnv(gym.Env):
     # create function for taking time step
     def step(self, action):
 
-        # check for wind update
-        self._update_variables()
-
         # Run cfd and gather observation
         next_state, water_loss = self.run_cfd_step(
             self.fluent_session,
@@ -106,6 +102,7 @@ class WaterInjectionEnv(gym.Env):
         )
 
         self.state = np.concatenate([next_state, [self.setpoint]])
+        self._update_variables()  # update setpoint and wind
         reward = self._compute_reward(self.state, action, water_loss)
         self.step_count += 1
         done = self.step_count >= self.max_steps
