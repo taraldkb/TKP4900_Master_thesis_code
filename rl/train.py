@@ -175,7 +175,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
                 injection2.append(map_value(action[1], 0, 20))
                 mass.append(map_value(action[2], 0, 100))
 
-            state, reward, done, _ = env.step(action)
+            state, reward, done, _ = env.test_step(action, wind_profile[counter], sp_profile[counter])
             total_reward += reward
 
             # save reward and state for plotting
@@ -183,9 +183,6 @@ def test_agent(policy_path=CONFIG["save_path"]):
             rewards.append(reward)
             counter += 1
         plot_conc("concentration.out", ep)
-
-
-
 
         print(f"[Test] Episode {ep + 1}: reward = {total_reward:.2f}")
 

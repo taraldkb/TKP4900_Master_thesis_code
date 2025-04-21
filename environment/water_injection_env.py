@@ -102,8 +102,8 @@ class WaterInjectionEnv(gym.Env):
         )
 
         self.state = np.concatenate([next_state, [self.setpoint]])
-        self._update_variables()  # update setpoint and wind
         reward = self._compute_reward(self.state, action, water_loss)
+        self._update_variables()  # update setpoint and wind
         self.step_count += 1
         done = self.step_count >= self.max_steps
 
@@ -201,4 +201,23 @@ class WaterInjectionEnv(gym.Env):
 
         return self.state
 
+    def test_step(self, action, wind, sp):
 
+        # Run cfd and gather observation
+        next_state, water_loss = self.run_cfd_step(
+            self.fluent_session,
+            self.state,
+            action,
+            self.design_params,
+            self.report_path,
+            self.loss_report_path
+        )
+
+        self.state = np.concatenate([next_state, [self.setpoint]])
+        reward = self._compute_reward(self.state, action, water_loss)
+        self.state[-2] = wind
+        self.state[-1] = sp  # update setpoint and wind
+        self.step_count += 1
+        done = self.step_count >= self.max_steps
+
+        return self.state, reward, done, {}
