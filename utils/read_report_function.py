@@ -102,7 +102,7 @@ def plot_water(file_path, run):
         plt.plot(time,data)
         plt.title(f"water usage run: {run}")
         plt.show()
-        print(data)
+
 
 
 
