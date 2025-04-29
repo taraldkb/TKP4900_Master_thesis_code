@@ -5,7 +5,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.distributions import Normal
-from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 import json
 from environment.water_injection_env import WaterInjectionEnv
