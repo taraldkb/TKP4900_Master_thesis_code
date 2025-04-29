@@ -149,12 +149,11 @@ def continue_train_agent(policy_path, log_path, episodes=100):
     optimizer_policy = optim.Adam(policy.parameters(), lr=CONFIG["lr_policy"])
     optimizer_value = optim.Adam(value.parameters(), lr=CONFIG["lr_value"])
 
-
     # find last recorded episode and current best reward
     last_episode = -1
     best_reward = -float("inf")
 
-    if os.path.exists(log_path): # check file exists
+    if os.path.exists(log_path):  # check file exists
         with open(log_path, mode="r") as csvfile:
             reader = csv.reader(csvfile)
             lines = list(reader)
@@ -168,15 +167,14 @@ def continue_train_agent(policy_path, log_path, episodes=100):
                 last_episode = -1
                 best_reward = -float("inf")
 
-    else: # make file if it does not exist
+    else:  # make file if it does not exist
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         last_episode = -1
-
 
     with open(log_path, mode="a", newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         if last_episode == -1:
-            csv_writer.writerow(["episode", "reward", "policy_loss","value_loss"]) # create header if new file
+            csv_writer.writerow(["episode", "reward", "policy_loss", "value_loss"])  # create header if new file
 
         for episode in range(episodes):
             episode_number = last_episode + 1 + episode
@@ -228,6 +226,7 @@ def continue_train_agent(policy_path, log_path, episodes=100):
 
     print("Training complete. Best reward:", best_reward)
 
+
 # create tester
 def test_agent(policy_path=CONFIG["save_path"]):
     env = WaterInjectionEnv(run_cfd_step)
@@ -254,7 +253,6 @@ def test_agent(policy_path=CONFIG["save_path"]):
         rewards = []
         done = False
         counter = 0
-
 
         while not done:
             with torch.no_grad():

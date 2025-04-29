@@ -12,7 +12,7 @@ elif choice == 1:
 elif choice == 2:
     continue_train_agent("Save/best_policy.pt", "logs/first_training.csv", 100)
 elif choice == 3:
-    plot_logs("logs/first_traning.csv")
+    plot_logs("logs/first_training.csv")
 else:
     print("nope")
 
