@@ -1,3 +1,4 @@
+import csv
 import os
 
 import torch
@@ -11,7 +12,7 @@ from environment.water_injection_env import WaterInjectionEnv
 from environment.cfd_interface import run_cfd_step
 from utils.map_value_function import *
 from utils.read_report_function import *
-import matplotlib.pyplot as plt
+from datetime import date
 
 # Load config
 with open("configs/RL_config.json", "r") as f:
@@ -69,8 +70,12 @@ def normalize(x):
 
 
 # create Train agent
-def train_agent():
-    writer = SummaryWriter(log_dir=CONFIG["log_dir"])
+def train_agent(log_name = None):
+
+    if log_name is None:
+        log_name = str(date.today())
+    log_name = log_name + ".csv"
+    log_file = os.path.join(CONFIG['log_dir'], log_name)
 
     env = WaterInjectionEnv(run_cfd_step)
     policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
@@ -81,63 +86,61 @@ def train_agent():
 
     best_reward = -float("inf")
 
-    for episode in range(CONFIG["epochs"]):
-        state = env.reset()
-        log_probs, rewards, values = [], [], []
-        done = False
-        total_reward = 0
+    with open(log_file, mode="w", newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(["episode", "reward", "policy_loss","value_loss"])
 
-        while not done:
-            state_tensor = torch.tensor(state, dtype=torch.float32)
-            mean, std = policy(state_tensor)
-            dist = Normal(mean, std)
-            action = dist.sample()
-            if CONFIG["clip_actions"]:
-                action = action.clamp(0, 1)
+        for episode in range(CONFIG["epochs"]):
+            state = env.reset()
+            log_probs, rewards, values = [], [], []
+            done = False
+            total_reward = 0
 
-            log_prob = dist.log_prob(action).sum()
-            value_est = value(state_tensor)
+            while not done:
+                state_tensor = torch.tensor(state, dtype=torch.float32)
+                mean, std = policy(state_tensor)
+                dist = Normal(mean, std)
+                action = dist.sample()
+                if CONFIG["clip_actions"]:
+                    action = action.clamp(0, 1)
 
-            next_state, reward, done, _ = env.step(action.detach().numpy())
+                log_prob = dist.log_prob(action).sum()
+                value_est = value(state_tensor)
 
-            log_probs.append(log_prob)
-            rewards.append(reward)
-            values.append(value_est)
-            state = next_state
-            total_reward += reward
+                next_state, reward, done, _ = env.step(action.detach().numpy())
 
-        returns = compute_returns(rewards, CONFIG["gamma"])
-        log_probs = torch.stack(log_probs)
-        values = torch.stack(values)
-        advantages = normalize(returns - values.detach())
+                log_probs.append(log_prob)
+                rewards.append(reward)
+                values.append(value_est)
+                state = next_state
+                total_reward += reward
 
-        policy_loss = -(log_probs * advantages).sum()
-        optimizer_policy.zero_grad()
-        policy_loss.backward()
-        optimizer_policy.step()
+            returns = compute_returns(rewards, CONFIG["gamma"])
+            log_probs = torch.stack(log_probs)
+            values = torch.stack(values)
+            advantages = normalize(returns - values.detach())
 
-        value_loss = nn.functional.mse_loss(values, returns)
-        optimizer_value.zero_grad()
-        value_loss.backward()
-        optimizer_value.step()
+            policy_loss = -(log_probs * advantages).sum()
+            optimizer_policy.zero_grad()
+            policy_loss.backward()
+            optimizer_policy.step()
 
-        writer.add_scalar("reward", total_reward, episode)
-        writer.add_scalar("loss/policy", policy_loss.item(), episode)
-        writer.add_scalar("loss/value", value_loss.item(), episode)
+            value_loss = nn.functional.mse_loss(values, returns)
+            optimizer_value.zero_grad()
+            value_loss.backward()
+            optimizer_value.step()
 
-        print(
-            f"Ep {episode + 1}: Reward={total_reward:.2f}, PolicyLoss={policy_loss.item():.3f}, "
-            f"ValueLoss={value_loss.item():.3f}")
+            csv_writer.writerow([episode, total_reward, policy_loss.item(), value_loss.item()])
+            csvfile.flush()
 
-        if total_reward > best_reward:
-            best_reward = total_reward
-            torch.save(policy.state_dict(), CONFIG["save_path"])
-    writer.close()
+            if total_reward > best_reward:
+                best_reward = total_reward
+                torch.save(policy.state_dict(), CONFIG["save_path"])
+
     print("Training complete. Best reward:", best_reward)
 
 
-def continue_train_agent(policy_path, episodes=100):
-    writer = SummaryWriter(log_dir=CONFIG["log_dir"])
+def continue_train_agent(policy_path, log_path, episodes=100):
 
     env = WaterInjectionEnv(run_cfd_step)
     policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
@@ -147,65 +150,83 @@ def continue_train_agent(policy_path, episodes=100):
     optimizer_policy = optim.Adam(policy.parameters(), lr=CONFIG["lr_policy"])
     optimizer_value = optim.Adam(value.parameters(), lr=CONFIG["lr_value"])
 
+
+    # find last recorded episode and current best reward
+    last_episode = -1
     best_reward = -float("inf")
 
-    for episode in range(episodes):
-        state = env.reset()
-        log_probs, rewards, values = [], [], []
-        done = False
-        total_reward = 0
+    if os.path.exists(log_path): # check file exists
+        with open(log_path, mode="r") as csvfile:
+            reader = csv.reader(csvfile)
+            lines = list(reader)
 
-        while not done:
-            state_tensor = torch.tensor(state, dtype=torch.float32)
-            mean, std = policy(state_tensor)
-            dist = Normal(mean, std)
-            action = dist.sample()
-            if CONFIG["clip_actions"]:
-                action = action.clamp(0, 1)
+            if len(lines) > 1:  # check for existing lines in log
+                last_episode = int(lines[-1][0])
+                rewards = [float(row[1]) for row in lines[1:] if len(row) > 1]
+                if rewards:
+                    best_reward = max(rewards)
+            else:
+                last_episode = -1
+                best_reward = -float("inf")
 
-            log_prob = dist.log_prob(action).sum()
-            value_est = value(state_tensor)
+    else: # make file if it does not exist
+        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+        last_episode = -1
 
-            next_state, reward, done, _ = env.step(action.detach().numpy())
 
-            log_probs.append(log_prob)
-            rewards.append(reward)
-            values.append(value_est)
-            state = next_state
-            total_reward += reward
+    with open(log_path, mode="a", newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        if last_episode == -1:
+            csv_writer.writerow(["episode", "reward", "policy_loss","value_loss"]) # create header if new file
 
-        returns = compute_returns(rewards, CONFIG["gamma"])
-        log_probs = torch.stack(log_probs)
-        values = torch.stack(values)
-        advantages = normalize(returns - values.detach())
+        for episode in range(episodes):
+            episode_number = last_episode + 1 + episode
+            state = env.reset()
+            log_probs, rewards, values = [], [], []
+            done = False
+            total_reward = 0
 
-        policy_loss = -(log_probs * advantages).sum()
-        optimizer_policy.zero_grad()
-        policy_loss.backward()
-        optimizer_policy.step()
+            while not done:
+                state_tensor = torch.tensor(state, dtype=torch.float32)
+                mean, std = policy(state_tensor)
+                dist = Normal(mean, std)
+                action = dist.sample()
+                if CONFIG["clip_actions"]:
+                    action = action.clamp(0, 1)
 
-        value_loss = nn.functional.mse_loss(values, returns)
-        optimizer_value.zero_grad()
-        value_loss.backward()
-        optimizer_value.step()
+                log_prob = dist.log_prob(action).sum()
+                value_est = value(state_tensor)
 
-        writer.add_scalar("reward", total_reward, episode)
-        writer.add_scalar("loss/policy", policy_loss.item(), episode)
-        writer.add_scalar("loss/value", value_loss.item(), episode)
+                next_state, reward, done, _ = env.step(action.detach().numpy())
 
-        print(
-            f"Ep {episode + 1}: Reward={total_reward:.2f}, PolicyLoss={policy_loss.item():.3f}, "
-            f"ValueLoss={value_loss.item():.3f}")
-        if episode == 0:
-            best_reward = total_reward
-        elif episode <= 2:
-            if total_reward > best_reward:
-                best_reward = total_reward
-        else:
+                log_probs.append(log_prob)
+                rewards.append(reward)
+                values.append(value_est)
+                state = next_state
+                total_reward += reward
+
+            returns = compute_returns(rewards, CONFIG["gamma"])
+            log_probs = torch.stack(log_probs)
+            values = torch.stack(values)
+            advantages = normalize(returns - values.detach())
+
+            policy_loss = -(log_probs * advantages).sum()
+            optimizer_policy.zero_grad()
+            policy_loss.backward()
+            optimizer_policy.step()
+
+            value_loss = nn.functional.mse_loss(values, returns)
+            optimizer_value.zero_grad()
+            value_loss.backward()
+            optimizer_value.step()
+
+            csv_writer.writerow([episode_number, total_reward, policy_loss.item(), value_loss.item()])
+            csvfile.flush()
+
             if total_reward > best_reward:
                 best_reward = total_reward
                 torch.save(policy.state_dict(), policy_path)
-    writer.close()
+
     print("Training complete. Best reward:", best_reward)
 
 # create tester

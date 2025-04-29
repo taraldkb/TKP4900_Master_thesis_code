@@ -6,7 +6,7 @@
     "gamma": 0.99,
     "lr_policy": 5e-4,
     "lr_value": 1e-3,
-    "log_dir": "logs/reinforce",
+    "log_dir": "logs",
     "save_path": "Save/best_policy.pt",
     "clip_actions": true
 }
