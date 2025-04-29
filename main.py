@@ -9,7 +9,7 @@ if choice == 0:
 elif choice == 1:
     train_agent()
 elif choice == 2:
-    continue_train_agent("Save/best_policy.pt", 100)
+    continue_train_agent("Save/best_policy.pt", "logs/first_training.csv", 100)
 else:
     print("nope")
 
