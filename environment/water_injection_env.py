@@ -7,6 +7,9 @@ import ansys.fluent.core as pyfluent
 from ansys.fluent.core import launch_fluent
 import random
 import time
+
+from sympy.codegen.ast import Raise
+
 from utils.read_report_function import *
 
 
@@ -126,8 +129,14 @@ class WaterInjectionEnv(gym.Env):
 
         # remove active sessions
         if self.fluent_session is not None:
-            self.fluent_session.exit()
-            self.fluent_session = None
+            try:
+                self.fluent_session.exit()
+                self.fluent_session = None
+            except Exception as e:
+                print(f"could not exit fluent session {e}")
+
+        self.fluent_session = None
+
 
         # clean up files between sessions
         while os.path.exists(self.report_path):
@@ -155,8 +164,22 @@ class WaterInjectionEnv(gym.Env):
             raise FileNotFoundError(f"Fluent case file not found: {case_path}")
 
         # create fluent session and load correct case
-        self.fluent_session = launch_fluent(mode="solver", precision="double", processor_count=8,
-                                            dimension=pyfluent.Dimension.TWO)
+        counter = 0
+        while True:
+            try:
+                self.fluent_session = launch_fluent(
+                    mode="solver",
+                    precision="double",
+                    processor_count=8,
+                    dimension=pyfluent.Dimension.TWO)
+                break
+            except Exception as e:
+                counter += 1
+                print(f"Fluent session failed: atempt {counter}")
+                if counter >= 10:
+                    raise RuntimeError(f"could not launch fluent. {e}")
+                time.sleep(0.5)
+
 
         self.fluent_session.file.read(file_type="case", file_name=case_path)
 
