@@ -150,9 +150,11 @@ def continue_train_agent(policy_path, log_path, episodes=100):
     optimizer_policy = optim.Adam(policy.parameters(), lr=CONFIG["lr_policy"])
     optimizer_value = optim.Adam(value.parameters(), lr=CONFIG["lr_value"])
 
+
+    # find last recorded episode and current best reward
+    last_episode = -1
     best_reward = -float("inf")
 
-    # find last recorded episode
     if os.path.exists(log_path): # check file exists
         with open(log_path, mode="r") as csvfile:
             reader = csv.reader(csvfile)
@@ -160,8 +162,12 @@ def continue_train_agent(policy_path, log_path, episodes=100):
 
             if len(lines) > 1:  # check for existing lines in log
                 last_episode = int(lines[-1][0])
+                rewards = [float(row[1]) for row in lines[1:] if len(row) > 1]
+                if rewards:
+                    best_reward = max(rewards)
             else:
-                last_episode = -1 # check if only header exists
+                last_episode = -1
+                best_reward = -float("inf")
 
     else: # make file if it does not exist
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
@@ -217,15 +223,9 @@ def continue_train_agent(policy_path, log_path, episodes=100):
             csv_writer.writerow([episode_number, total_reward, policy_loss.item(), value_loss.item()])
             csvfile.flush()
 
-            if episode == 0:
+            if total_reward > best_reward:
                 best_reward = total_reward
-            elif episode <= 2:
-                if total_reward > best_reward:
-                    best_reward = total_reward
-            else:
-                if total_reward > best_reward:
-                    best_reward = total_reward
-                    torch.save(policy.state_dict(), policy_path)
+                torch.save(policy.state_dict(), policy_path)
 
     print("Training complete. Best reward:", best_reward)
 
