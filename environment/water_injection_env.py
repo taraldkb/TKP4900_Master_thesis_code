@@ -67,7 +67,7 @@ class WaterInjectionEnv(gym.Env):
         self.setpoint = 20.0
 
         # create initall state and actions for intializing system
-        self.initial_actions = np.array([0.25, 0.25, 0.49494949])
+        self.initial_actions = np.array([0.25, 0.25, 0.5])
         self.state = self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
 
         # create action space 3 actions [injection1, injection2, mass_flow]
@@ -237,7 +237,7 @@ class WaterInjectionEnv(gym.Env):
         self.state = np.concatenate([next_state, [self.setpoint]])
         reward = self._compute_reward(self.state, action, water_loss)
         self.state[-2] = wind
-        self.state[-1] = sp  # update setpoint and wind
+        self.state[-1] = sp  # update setpoint and wind for next step
         self.step_count += 1
         done = self.step_count >= self.max_steps
 

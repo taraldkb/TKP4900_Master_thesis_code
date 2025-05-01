@@ -234,6 +234,8 @@ def test_agent(policy_path=CONFIG["save_path"]):
     policy.load_state_dict(torch.load(policy_path))
     policy.eval()
 
+    time_step_actions = list(range(0, 21, 2))
+    time_step_state = list(range(2, 23, 2))
     wind_profiles_lib = [[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
                          [0.5, 0.95, 0.95, 0.95, 0.95, 0.2, 0.2, 0.2, 0.2, 0.2],
                          [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 0.8]]
@@ -242,11 +244,24 @@ def test_agent(policy_path=CONFIG["save_path"]):
                        [20.0, 25.0, 30.0, 30.0,  30.0, 30.0, 30.0, 30.0, 30.0, 30.0]]
 
     for ep in range(3):
+        # get variable profile
         wind_profile = wind_profiles_lib[ep]
         sp_profile = sp_profiles_lib[ep]
+
+        # reset state
+        state = env.testing_reset()
+
+        # save for plotting
         injection1 = [map_value(0.25, 0, 10)]
         injection2 = [map_value(0.25, 0, 10)]
-        state = env.testing_reset()
+        mass = [map_value(0.5, 0, 100)]
+        conc_plot = [[] for _ in range(8)]
+        wind_plot = [state[-2]]
+        sp_plot = [state[-1]]
+
+        for i in range(len(conc_plot)):
+            conc_plot[i].append(state[i])
+
         total_reward = 0
         total_rewards = []
         rewards = []
@@ -262,6 +277,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
                 # save actions for plotting
                 injection1.append(map_value(action[0], 0, 20))
                 injection2.append(map_value(action[1], 0, 20))
+                mass.append((map_value(action[2], 0, 100)))
 
             state, reward, done, _ = env.test_step(action, wind_profile[counter], sp_profile[counter])
             total_reward += reward
@@ -270,9 +286,6 @@ def test_agent(policy_path=CONFIG["save_path"]):
             total_rewards.append(total_reward)
             rewards.append(reward)
             counter += 1
-        plot_conc("concentration.out", ep+1)
-        plot_water("water_usage.out", ep+1)
-
         print(f"[Test] Episode {ep + 1}: reward = {total_reward:.2f}")
 
 
