@@ -12,6 +12,7 @@ from environment.cfd_interface import run_cfd_step
 from utils.map_value_function import *
 from utils.read_report_function import *
 from datetime import date
+import matplotlib.pyplot as plt
 
 # Load config
 with open("configs/RL_config.json", "r") as f:
@@ -69,7 +70,7 @@ def normalize(x):
 
 
 # create Train agent
-def train_agent(log_name = None):
+def train_agent(log_name=None):
 
     if log_name is None:
         log_name = str(date.today())
@@ -87,7 +88,7 @@ def train_agent(log_name = None):
 
     with open(log_file, mode="w", newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(["episode", "reward", "policy_loss","value_loss"])
+        csv_writer.writerow(["episode", "reward", "policy_loss", "value_loss"])
 
         for episode in range(CONFIG["epochs"]):
             state = env.reset()
@@ -234,6 +235,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
     policy.load_state_dict(torch.load(policy_path))
     policy.eval()
 
+    time_step = list(range(0, 23, 2))
     wind_profiles_lib = [[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
                          [0.5, 0.95, 0.95, 0.95, 0.95, 0.2, 0.2, 0.2, 0.2, 0.2],
                          [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 0.8]]
@@ -242,12 +244,24 @@ def test_agent(policy_path=CONFIG["save_path"]):
                        [20.0, 25.0, 30.0, 30.0,  30.0, 30.0, 30.0, 30.0, 30.0, 30.0]]
 
     for ep in range(3):
+        # get variable profile
         wind_profile = wind_profiles_lib[ep]
         sp_profile = sp_profiles_lib[ep]
-        injection1 = []
-        injection2 = []
-        mass = []
+
+        # reset state
         state = env.testing_reset()
+
+        # save for plotting
+        injection1 = [map_value(0.25, 0, 10)]
+        injection2 = [map_value(0.25, 0, 10)]
+        mass = [map_value(0.5, 0, 100)]
+        conc_plot = [[] for _ in range(8)]
+        wind_plot = [state[-2]]
+        sp_plot = [state[-1]]
+
+        for i in range(len(conc_plot)):
+            conc_plot[i].append(state[i])
+
         total_reward = 0
         total_rewards = []
         rewards = []
@@ -263,7 +277,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
                 # save actions for plotting
                 injection1.append(map_value(action[0], 0, 20))
                 injection2.append(map_value(action[1], 0, 20))
-                mass.append(map_value(action[2], 0, 100))
+                mass.append((map_value(action[2], 0, 100)))
 
             state, reward, done, _ = env.test_step(action, wind_profile[counter], sp_profile[counter])
             total_reward += reward
@@ -271,10 +285,80 @@ def test_agent(policy_path=CONFIG["save_path"]):
             # save reward and state for plotting
             total_rewards.append(total_reward)
             rewards.append(reward)
+            wind_plot.append(state[-2])
+            sp_plot.append(state[-1])
+            for i in range(len(conc_plot)):
+                conc_plot[i].append(state[i])
             counter += 1
-        plot_conc("concentration.out", ep)
 
         print(f"[Test] Episode {ep + 1}: reward = {total_reward:.2f}")
+
+        # add duplicate for plotting visuals
+        injection1.append(injection1[-1])
+        injection2.append(injection2[-1])
+        mass.append(mass[-1])
+        wind_plot.append(wind_plot[-1])
+        sp_plot.append(sp_plot[-1])
+        for i in range(len(conc_plot)):
+            conc_plot[i].append(conc_plot[i][-1])
+
+        # Plotting
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, injection1, where="post", label="Injection 1")
+        plt.step(time_step, injection2, where="post", label="Injection 2")
+        plt.legend()
+        plt.grid()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Velocity [m/s]")
+        plt.title(f"Injection velocity test run {ep+1}")
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, mass, where="post")
+        plt.grid()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Mass flow [kg/s check this !!!!!]")
+        plt.title(f"Injection mass flow test run {ep+1}")
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, wind_plot, where="post")
+        plt.grid()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Velocity [m/s]")
+        plt.title(f"Wind velocity test run {ep+1}")
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, sp_plot, where="post", label="Concentration setpoint")
+        for i in range(4):
+            plt.step(time_step, conc_plot[i], where="post", label=f"Zone {i+1}")
+        plt.grid()
+        plt.legend()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Concentration [INSERT Units!!!!]")
+        plt.title(f"Concentrations left zones and Setpoint test run {ep+1}")
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, sp_plot, where="post", label="Concentration setpoint")
+        for i in range(4, 8):
+            plt.step(time_step, conc_plot[i], where="post", label=f"Zone {i + 1}")
+        plt.grid()
+        plt.legend()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Concentration [INSERT Units!!!!]")
+        plt.title(f"Concentrations right zones and Setpoint test run {ep+1}")
+        plt.show()
+
+        plot_water("water_loss.out")
+
+
+
+
+
+
+
 
 
 
