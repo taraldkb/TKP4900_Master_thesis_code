@@ -137,7 +137,6 @@ class WaterInjectionEnv(gym.Env):
 
         self.fluent_session = None
 
-
         # clean up files between sessions
         while os.path.exists(self.report_path):
             try:
@@ -175,11 +174,10 @@ class WaterInjectionEnv(gym.Env):
                 break
             except Exception as e:
                 counter += 1
-                print(f"Fluent session failed: atempt {counter}")
+                print(f"Fluent session failed: attempt {counter}")
                 if counter >= 10:
                     raise RuntimeError(f"could not launch fluent. {e}")
                 time.sleep(0.5)
-
 
         self.fluent_session.file.read(file_type="case", file_name=case_path)
 
