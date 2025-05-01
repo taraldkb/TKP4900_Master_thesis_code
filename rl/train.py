@@ -244,9 +244,8 @@ def test_agent(policy_path=CONFIG["save_path"]):
     for ep in range(3):
         wind_profile = wind_profiles_lib[ep]
         sp_profile = sp_profiles_lib[ep]
-        injection1 = []
-        injection2 = []
-        mass = []
+        injection1 = [map_value(0.25, 0, 10)]
+        injection2 = [map_value(0.25, 0, 10)]
         state = env.testing_reset()
         total_reward = 0
         total_rewards = []
@@ -263,7 +262,6 @@ def test_agent(policy_path=CONFIG["save_path"]):
                 # save actions for plotting
                 injection1.append(map_value(action[0], 0, 20))
                 injection2.append(map_value(action[1], 0, 20))
-                mass.append(map_value(action[2], 0, 100))
 
             state, reward, done, _ = env.test_step(action, wind_profile[counter], sp_profile[counter])
             total_reward += reward
@@ -272,7 +270,8 @@ def test_agent(policy_path=CONFIG["save_path"]):
             total_rewards.append(total_reward)
             rewards.append(reward)
             counter += 1
-        plot_conc("concentration.out", ep)
+        plot_conc("concentration.out", ep+1)
+        plot_water("water_usage.out", ep+1)
 
         print(f"[Test] Episode {ep + 1}: reward = {total_reward:.2f}")
 

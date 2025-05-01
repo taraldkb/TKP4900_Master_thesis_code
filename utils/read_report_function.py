@@ -80,6 +80,7 @@ def plot_conc(file_path, run):
             plt.plot(time, data[i], label=f" wall {i+1}")
         plt.title(f"concentrations run: {run}")
         plt.legend()
+        plt.grid()
         plt.show()
 
     except FileNotFoundError:
@@ -99,8 +100,9 @@ def plot_water(file_path, run):
             data.append(round(float(holder[-1]),2))
             time.append(float(holder[1]))
 
-        plt.plot(time,data)
+        plt.plot(time, data)
         plt.title(f"water usage run: {run}")
+        plt.grid()
         plt.show()
 
     except FileNotFoundError:
