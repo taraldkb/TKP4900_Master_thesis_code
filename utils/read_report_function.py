@@ -75,7 +75,7 @@ def plot_conc(file_path, run):
 
             for i in range(len(holder)):
                 data[i].append(float(holder[i]))
-
+        plt. figure(figsize=(10, 6))
         for i in range(len(data)):
             plt.plot(time, data[i], label=f" wall {i+1}")
         plt.title(f"concentrations run: {run}")
