@@ -310,7 +310,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
         plt.grid()
         plt.xlabel("Time step [s]")
         plt.ylabel("Velocity [m/s]")
-        plt.title(f"Injection velocity test run {ep}")
+        plt.title(f"Injection velocity test run {ep+1}")
         plt.show()
 
         plt.figure(figsize=(10, 6))
@@ -318,7 +318,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
         plt.grid()
         plt.xlabel("Time step [s]")
         plt.ylabel("Mass flow [kg/s check this !!!!!]")
-        plt.title(f"Injection mass flow test run {ep}")
+        plt.title(f"Injection mass flow test run {ep+1}")
         plt.show()
 
         plt.figure(figsize=(10, 6))
@@ -326,10 +326,30 @@ def test_agent(policy_path=CONFIG["save_path"]):
         plt.grid()
         plt.xlabel("Time step [s]")
         plt.ylabel("Velocity [m/s]")
-        plt.title(f"Wind velocity test run {ep}")
+        plt.title(f"Wind velocity test run {ep+1}")
         plt.show()
 
         plt.figure(figsize=(10, 6))
+        plt.step(time_step, sp_plot, where="post", label="Concentration setpoint")
+        for i in range(4):
+            plt.step(time_step, conc_plot[i], where="post", label=f"Zone {i+1}")
+        plt.grid()
+        plt.legend()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Concentration [INSERT Units!!!!]")
+        plt.title(f"Concentrations left zones and Setpoint test run {ep+1}")
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, sp_plot, where="post", label="Concentration setpoint")
+        for i in range(4, 8):
+            plt.step(time_step, conc_plot[i], where="post", label=f"Zone {i + 1}")
+        plt.grid()
+        plt.legend()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Concentration [INSERT Units!!!!]")
+        plt.title(f"Concentrations right zones and Setpoint test run {ep+1}")
+        plt.show()
 
 
 
