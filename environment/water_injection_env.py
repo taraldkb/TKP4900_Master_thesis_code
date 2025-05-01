@@ -8,8 +8,6 @@ from ansys.fluent.core import launch_fluent
 import random
 import time
 
-from sympy.codegen.ast import Raise
-
 from utils.read_report_function import *
 
 
