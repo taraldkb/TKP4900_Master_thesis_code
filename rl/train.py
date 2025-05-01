@@ -69,7 +69,7 @@ def normalize(x):
 
 
 # create Train agent
-def train_agent(log_name = None):
+def train_agent(log_name=None):
 
     if log_name is None:
         log_name = str(date.today())
