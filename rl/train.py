@@ -88,7 +88,7 @@ def train_agent(log_name=None):
 
     with open(log_file, mode="w", newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(["episode", "reward", "policy_loss","value_loss"])
+        csv_writer.writerow(["episode", "reward", "policy_loss", "value_loss"])
 
         for episode in range(CONFIG["epochs"]):
             state = env.reset()
