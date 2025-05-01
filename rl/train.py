@@ -285,8 +285,14 @@ def test_agent(policy_path=CONFIG["save_path"]):
             # save reward and state for plotting
             total_rewards.append(total_reward)
             rewards.append(reward)
+            wind_plot.append(state[-2])
+            sp_plot.append(state[-1])
+            for i in range(len(conc_plot)):
+                conc_plot[i].append(state[i])
             counter += 1
+
         print(f"[Test] Episode {ep + 1}: reward = {total_reward:.2f}")
+
 
 
 
