@@ -8,8 +8,6 @@ from ansys.fluent.core import launch_fluent
 import random
 import time
 
-from sympy.codegen.ast import Raise
-
 from utils.read_report_function import *
 
 
@@ -66,16 +64,16 @@ class WaterInjectionEnv(gym.Env):
         self._current_wind = 0.5
         self.setpoint = 20.0
 
-        # create initall state and actions for intializing system
+        # create initial state and actions for initializing system
         self.initial_actions = np.array([0.25, 0.25, 0.5])
-        self.state = self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
+        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
 
         # create action space 3 actions [injection1, injection2, mass_flow]
         self.action_space = spaces.Box(low=0.0,
                                        high=1.0,
                                        shape=(3,), dtype=np.float32)
 
-        # create observation space 10 obs [8 zones, wind, setpoint], value between 0-1, set proper values for zone value
+        # create observation space 10 obs [8 zones, wind, setpoint]
         self.observation_space = spaces.Box(low=np.zeros(10),
                                             high=np.append(np.full(8, 100), [1.0, 50]),
                                             shape=(10,), dtype=np.float32)
@@ -87,6 +85,7 @@ class WaterInjectionEnv(gym.Env):
         self.episode_count += 1
         self.step_count = 0
         self._get_profiles()
+        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
         self._get_initial_state()
 
         return self.state
