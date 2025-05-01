@@ -12,6 +12,7 @@ from environment.cfd_interface import run_cfd_step
 from utils.map_value_function import *
 from utils.read_report_function import *
 from datetime import date
+import matplotlib.pyplot as plt
 
 # Load config
 with open("configs/RL_config.json", "r") as f:
@@ -234,8 +235,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
     policy.load_state_dict(torch.load(policy_path))
     policy.eval()
 
-    time_step_actions = list(range(0, 21, 2))
-    time_step_state = list(range(2, 23, 2))
+    time_step = list(range(0, 23, 2))
     wind_profiles_lib = [[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
                          [0.5, 0.95, 0.95, 0.95, 0.95, 0.2, 0.2, 0.2, 0.2, 0.2],
                          [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 0.8]]
@@ -292,6 +292,50 @@ def test_agent(policy_path=CONFIG["save_path"]):
             counter += 1
 
         print(f"[Test] Episode {ep + 1}: reward = {total_reward:.2f}")
+
+        # add duplicate for plotting visuals
+        injection1.append(injection1[-1])
+        injection2.append(injection2[-1])
+        mass.append(mass[-1])
+        wind_plot.append(wind_plot[-1])
+        sp_plot.append(sp_plot[-1])
+        for i in range(len(conc_plot)):
+            conc_plot[i].append(conc_plot[i][-1])
+
+        # Plotting
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, injection1, where="post", label="Injection 1")
+        plt.step(time_step, injection2, where="post", label="Injection 2")
+        plt.legend()
+        plt.grid()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Velocity [m/s]")
+        plt.title(f"Injection velocity test run {ep}")
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, mass, where="post")
+        plt.grid()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Mass flow [kg/s check this !!!!!]")
+        plt.title(f"Injection mass flow test run {ep}")
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+        plt.step(time_step, wind_plot, where="post")
+        plt.grid()
+        plt.xlabel("Time step [s]")
+        plt.ylabel("Velocity [m/s]")
+        plt.title(f"Wind velocity test run {ep}")
+        plt.show()
+
+        plt.figure(figsize=(10, 6))
+
+
+
+
+
+
 
 
 
