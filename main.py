@@ -1,4 +1,4 @@
-from rl.train import train_agent, continue_train_agent
+from rl.train import *
 from utils.cleanup import cleanup
 from utils.plot_logs_function import plot_logs
 import os
@@ -13,6 +13,8 @@ elif choice == 2:
     continue_train_agent("Save/best_policy.pt", "logs/first_training.csv", 100)
 elif choice == 3:
     plot_logs("logs/first_training.csv")
+elif choice == 4:
+    test_agent("Save/best_policy.pt")
 else:
     print("nope")
 
