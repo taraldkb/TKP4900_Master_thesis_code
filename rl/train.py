@@ -256,7 +256,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
         injection2 = [map_value(0.25, 0, 10)]
         mass = [map_value(0.5, 0, 100)]
         conc_plot = [[] for _ in range(8)]
-        wind_plot = [state[-2]]
+        wind_plot = [map_value(state[-2], 0.0, 20.0)]
         sp_plot = [state[-1]]
 
         for i in range(len(conc_plot)):
@@ -285,7 +285,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
             # save reward and state for plotting
             total_rewards.append(total_reward)
             rewards.append(reward)
-            wind_plot.append(state[-2])
+            wind_plot.append(map_value(state[-2], 0.0, 20.0))
             sp_plot.append(state[-1])
             for i in range(len(conc_plot)):
                 conc_plot[i].append(state[i])
