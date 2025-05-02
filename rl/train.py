@@ -13,6 +13,7 @@ from utils.map_value_function import *
 from utils.read_report_function import *
 from datetime import date
 import matplotlib.pyplot as plt
+from torch.optim.lr_scheduler import StepLR
 
 # Load config
 with open("configs/RL_config.json", "r") as f:
@@ -84,6 +85,10 @@ def train_agent(log_name=None):
     optimizer_policy = optim.Adam(policy.parameters(), lr=CONFIG["lr_policy"])
     optimizer_value = optim.Adam(value.parameters(), lr=CONFIG["lr_value"])
 
+    # create learning rate schedulers
+    scheduler_policy = StepLR(optimizer_policy, step_size=75, gamma=0.9)
+    scheduler_value = StepLR(optimizer_value, step_size=75, gamma=0.9)
+
     best_reward = -float("inf")
 
     with open(log_file, mode="w", newline='') as csvfile:
@@ -133,6 +138,10 @@ def train_agent(log_name=None):
             csv_writer.writerow([episode, total_reward, policy_loss.item(), value_loss.item()])
             csvfile.flush()
 
+            # step scheduler
+            scheduler_policy.step()
+            scheduler_value.step()
+
             if total_reward > best_reward:
                 best_reward = total_reward
                 torch.save(policy.state_dict(), CONFIG["save_path"])
@@ -149,6 +158,10 @@ def continue_train_agent(policy_path, log_path, episodes=100):
 
     optimizer_policy = optim.Adam(policy.parameters(), lr=CONFIG["lr_policy"])
     optimizer_value = optim.Adam(value.parameters(), lr=CONFIG["lr_value"])
+
+    # create learning rate schedulers
+    scheduler_policy = StepLR(optimizer_policy, step_size=75, gamma=0.9)
+    scheduler_value = StepLR(optimizer_value, step_size=75, gamma=0.9)
 
     # find last recorded episode and current best reward
     last_episode = -1
@@ -220,6 +233,9 @@ def continue_train_agent(policy_path, log_path, episodes=100):
 
             csv_writer.writerow([episode_number, total_reward, policy_loss.item(), value_loss.item()])
             csvfile.flush()
+            # step scheduler
+            scheduler_policy.step()
+            scheduler_value.step()
 
             if total_reward > best_reward:
                 best_reward = total_reward
