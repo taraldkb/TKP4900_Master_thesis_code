@@ -200,8 +200,9 @@ class WaterInjectionEnv(gym.Env):
             self.loss_report_path
         )
 
-        plot_conc(self.report_path, self.episode_count)
-        plot_water(self.water_usage_report_path, self.episode_count)
+        if self.episode_count % 100 == 0:
+            plot_conc(self.report_path, self.episode_count)
+            plot_water(self.water_usage_report_path, self.episode_count)
 
         self.state = np.concatenate([initial_state, [self.setpoint]])
 
