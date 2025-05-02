@@ -351,7 +351,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
         plt.title(f"Concentrations right zones and Setpoint test run {ep+1}")
         plt.show()
 
-        plot_water("water_loss.out")
+        plot_water("water_loss.out",ep+1)
 
 
 
