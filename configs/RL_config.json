@@ -2,7 +2,7 @@
     "state_dim": 10,
     "action_dim": 3,
     "hidden_size": 256,
-    "epochs": 1000,
+    "epochs": 50,
     "gamma": 0.99,
     "lr_policy": 1e-4,
     "lr_value": 1e-4,
