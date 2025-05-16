@@ -14,7 +14,7 @@ elif choice == 2:
 elif choice == 3:
     plot_logs("logs/case2.csv")
 elif choice == 4:
-    test_agent("Save/Case1.pt")
+    test_agent("Save/Case2.pt")
 else:
     print("nope")
 

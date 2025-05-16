@@ -268,8 +268,8 @@ def test_agent(policy_path=CONFIG["save_path"]):
         state = env.testing_reset()
 
         # save for plotting
-        injection1 = [map_value(0.25, 0, 10)]
-        injection2 = [map_value(0.25, 0, 10)]
+        injection1 = [map_value(0.25, 0, 20)]
+        injection2 = [map_value(0.25, 0, 20)]
         mass = [map_value(0.5, 0, 100)]
         conc_plot = [[] for _ in range(8)]
         wind_plot = [map_value(state[-2], 0.0, 20.0)]
