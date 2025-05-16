@@ -12,9 +12,9 @@ elif choice == 1:
 elif choice == 2:
     continue_train_agent("Save/best_policy.pt", "logs/first_training.csv", 100)
 elif choice == 3:
-    plot_logs("logs/2025-05-02.csv")
+    plot_logs("logs/case2.csv")
 elif choice == 4:
-    test_agent("Save/best_policy.pt")
+    test_agent("Save/Case1.pt")
 else:
     print("nope")
 
