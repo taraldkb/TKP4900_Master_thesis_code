@@ -3,10 +3,28 @@ import json
 from environment.water_injection_env import WaterInjectionEnv
 from environment.cfd_interface import run_cfd_step
 from utils.map_value_function import *
-from utils.read_report_function import *
 import matplotlib.pyplot as plt
 from rl.network import PolicyNet
+import matplotlib as mpl
 
+# nice plotting
+mpl.rcParams.update({
+    "text.usetex": False,
+    "font.family": "DejaVu Sans",
+    "font.size": 10,
+    "axes.labelsize": 10,
+    "legend.fontsize": 8,
+    "xtick.labelsize": 8,
+    "ytick.labelsize": 8,
+    "figure.dpi": 300,
+    "lines.linewidth": 1.5,
+    "legend.frameon": False,
+    "grid.linestyle": "--",
+    "grid.alpha": 0.7,
+})
+
+fig_width = 6.27
+fig_height = fig_width * 0.618
 
 # read config
 with open("configs/RL_config.json", "r") as f:
@@ -88,52 +106,60 @@ def test_agent(policy_path=CONFIG["save_path"]):
             conc_plot[i].append(conc_plot[i][-1])
 
         # Plotting
-        plt.figure(figsize=(10, 6))
-        plt.step(time_step, injection1, where="post", label="Injection 1")
-        plt.step(time_step, injection2, where="post", label="Injection 2")
-        plt.legend()
-        plt.grid()
-        plt.xlabel("Time [s]")
-        plt.ylabel("Velocity [m/s]")
-        plt.title(f"Injection velocity test run {ep+1}")
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        ax.step(time_step, injection1, where="post", label="Injection 1")
+        ax.step(time_step, injection2, where="post", label="Injection 2")
+        ax.set_xlabel("Time [s]")
+        ax.set_ylabel("Velocity [m/s]")
+        ax.set_title(f"Injection velocity test run {ep+1}")
+        ax.legend()
+        ax.grid()
+        fig.tight_layout()
+        fig.savefig(f"injection_vel_run{ep+1}.pdf")
         plt.show()
 
-        plt.figure(figsize=(10, 6))
-        plt.step(time_step, mass, where="post")
-        plt.grid()
-        plt.xlabel("Time [s]")
-        plt.ylabel("Mass flow [kg/s]")
-        plt.title(f"Injection mass flow test run {ep+1}")
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        ax.step(time_step, mass, where="post")
+        ax.set_xlabel("Time [s]")
+        ax.set_ylabel("Mass flow [kg/s]")
+        ax.set_title(f"Injection mass flow test run {ep+1}")
+        ax.grid()
+        fig.tight_layout()
+        fig.savefig(f"mass_flow_run{ep + 1}.pdf")
         plt.show()
 
-        plt.figure(figsize=(10, 6))
-        plt.step(time_step, wind_plot, where="post")
-        plt.grid()
-        plt.xlabel("Time [s]")
-        plt.ylabel("Velocity [m/s]")
-        plt.title(f"Wind velocity test run {ep+1}")
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        ax.step(time_step, wind_plot, where="post")
+        ax.set_xlabel("Time [s]")
+        ax.set_ylabel("Velocity [m/s]")
+        ax.set_title(f"Wind velocity test run {ep+1}")
+        ax.grid()
+        fig.tight_layout()
+        fig.savefig(f"mass_flow_run{ep + 1}.pdf")
         plt.show()
 
-        plt.figure(figsize=(10, 6))
-        plt.step(time_step, sp_plot, where="post", label="Concentration setpoint")
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        ax.step(time_step, sp_plot, where="post", label="Concentration setpoint")
         for i in range(4):
-            plt.step(time_step, conc_plot[i], where="post", label=f"Zone {i+1}")
-        plt.grid()
-        plt.legend()
-        plt.xlabel("Time [s]")
-        plt.ylabel(r"Concentration [kg/m$^3$]")
-        plt.title(f"Concentrations left zones and Setpoint test run {ep+1}")
+            ax.step(time_step, conc_plot[i], where="post", label=f"Zone {i+1}")
+        ax.grid()
+        ax.legend()
+        ax.set_xlabel("Time [s]")
+        ax.set_ylabel(r"Concentration [kg/m$^3$]")
+        ax.set_title(f"Concentrations left zones and Setpoint test run {ep+1}")
+        fig.tight_layout()
+        fig.savefig(f"concentrationLeft{ep + 1}.pdf")
         plt.show()
 
-        plt.figure(figsize=(10, 6))
-        plt.step(time_step, sp_plot, where="post", label="Concentration setpoint")
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        ax.step(time_step, sp_plot, where="post", label="Concentration setpoint")
         for i in range(4, 8):
-            plt.step(time_step, conc_plot[i], where="post", label=f"Zone {i + 1}")
-        plt.grid()
-        plt.legend()
-        plt.xlabel("Time [s]")
-        plt.ylabel(r"Concentration [kg/m$^3$]")
-        plt.title(f"Concentrations right zones and Setpoint test run {ep+1}")
+            ax.step(time_step, conc_plot[i], where="post", label=f"Zone {i + 1}")
+        ax.grid()
+        ax.legend()
+        ax.set_xlabel("Time [s]")
+        ax.set_ylabel(r"Concentration [kg/m$^3$]")
+        ax.set_title(f"Concentrations right zones and Setpoint test run {ep+1}")
+        fig.tight_layout()
+        fig.savefig(f"concentrationRight{ep + 1}.pdf")
         plt.show()
-
-        plot_water("water_loss.out", ep+1)
