@@ -1,4 +1,5 @@
-from rl.train import *
+from rl.train import train_agent, continue_train_agent
+from rl.test import test_agent
 from utils.cleanup import cleanup
 from utils.plot_logs_function import plot_logs
 import os
