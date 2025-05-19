@@ -6,10 +6,7 @@ from torch.distributions import Normal
 import json
 from environment.water_injection_env import WaterInjectionEnv
 from environment.cfd_interface import run_cfd_step
-from utils.map_value_function import *
-from utils.read_report_function import *
 from datetime import date
-import matplotlib.pyplot as plt
 from torch.optim.lr_scheduler import StepLR
 from rl.network import PolicyNet, ValueNet
 from utils.training_functions import compute_returns, normalize
