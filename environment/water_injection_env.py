@@ -119,7 +119,6 @@ class WaterInjectionEnv(gym.Env):
         self.state[-1] = self.setpoint
 
     def _compute_reward(self, state, action, water_loss):
-        # reward function for RL, should check this reward
         moisture = state[:-2]
         sp = state[-1]
         return -np.sum((moisture - sp) ** 2) - 0.01 * np.sum(action ** 2) - 0.1*water_loss
