@@ -2,6 +2,7 @@ import numpy as np
 from pyomo.environ import ConcreteModel, Var, Objective, Constraint, SolverFactory, Binary, summation, value
 from rl.optimazation_test import pi
 from optimazation.get_state_function import get_state
+from utils.cleanup import cleanup
 
 
 # define constants
@@ -12,6 +13,8 @@ Q_u = 1
 # get state from CFD
 state = get_state()
 
+# remove report files
+cleanup()
 
 # define material Cost function
 def C_m(H, N):
@@ -23,24 +26,12 @@ def C_p(cost_m, u, q_m=1, q_u=1):
     return q_m*cost_m + q_u*u
 
 
-# create pymo model
-model = ConcreteModel()
-
-# define the decision variables
-model.z_index = range(len(h))
-model.z = Var(model.z_index, domain=Binary)
-model.y = Var(domain=Binary)
-
-
 # define constraint on z variable and add to model add constraint to model
 def z_rule(model):
     sum_z = 0
     for i in model.z_index:
         sum_z += model.z[i]
     return sum_z
-
-
-model.z_constraint = Constraint(rule=z_rule)
 
 
 # define variable relations
@@ -64,8 +55,21 @@ def optim_rule(model):
     return C_p(cost_m, u, Q_m, Q_u)
 
 
-model.obj =Objective(rule= optim_rule, sense=1)
+# create pymo model
+model = ConcreteModel()
 
+# define the decision variables
+model.z_index = range(len(h))
+model.z = Var(model.z_index, domain=Binary)
+model.y = Var(domain=Binary)
+
+# add constraint to model
+model.z_constraint = Constraint(rule=z_rule)
+
+# add objective function to model
+model.obj = Objective(rule=optim_rule, sense=1)
+
+# solve
 solver = SolverFactory('glpk')
 result = solver.solve(model)
 
