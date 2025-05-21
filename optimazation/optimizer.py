@@ -77,8 +77,8 @@ H_opt = value(H_rel(model))
 N_opt = value(N_rel(model))
 
 print("Optimization complete")
-print(f"Optimal Height: {H} millimeters")
-print(f"Optimal amount of injectors: {N} injector(s)")
+print(f"Optimal Height: {H_opt} millimeters")
+print(f"Optimal amount of injectors: {N_opt} injector(s)")
 
 
 
