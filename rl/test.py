@@ -128,15 +128,7 @@ def test_agent(policy_path=CONFIG["save_path"]):
         fig.savefig(f"mass_flow_run{ep + 1}.pdf")
         plt.show()
 
-        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-        ax.step(time_step, wind_plot, where="post")
-        ax.set_xlabel("Time [s]")
-        ax.set_ylabel("Velocity [m/s]")
-        ax.set_title(f"Wind velocity test run {ep+1}")
-        ax.grid()
-        fig.tight_layout()
-        fig.savefig(f"mass_flow_run{ep + 1}.pdf")
-        plt.show()
+
 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
         ax.step(time_step, sp_plot, where="post", label="Concentration setpoint")
