@@ -3,6 +3,7 @@ import os
 import torch
 import torch.optim as optim
 from torch.distributions import Normal
+import torch.nn as nn
 import json
 from environment.water_injection_env import WaterInjectionEnv
 from environment.cfd_interface import run_cfd_step
