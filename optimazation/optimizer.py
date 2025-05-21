@@ -16,9 +16,10 @@ state = get_state()
 # remove report files
 cleanup()
 
+
 # define material Cost function
 def C_m(H, N):
-    return H*2 + N*30
+    return H + N * 50
 
 
 # define objective function
