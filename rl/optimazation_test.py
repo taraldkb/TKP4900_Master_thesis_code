@@ -13,7 +13,7 @@ with open("configs/RL_config.json", "r") as f:
 def pi(state, H, N):
 
     # define wind an setpoint states
-    wind = [0.5, 0.5, 0.75, 0.75]
+    wind = [0.25, 0.25, 0.75, 0.75]
     sp = [10, 20, 10, 20]
 
     # create saving array for water usage
