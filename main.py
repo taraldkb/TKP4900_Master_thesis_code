@@ -12,7 +12,8 @@ elif choice == 1:
     train_agent()
 elif choice == 2:
     case = input("which case: ")
-    continue_train_agent("Save/Case"+case+".pt", "logs/case"+case+".csv", 100)
+    ep = int(input("how many episodes: "))
+    continue_train_agent("Save/Case"+case+".pt", "logs/case"+case+".csv", ep)
 elif choice == 3:
     case = input("which case: ")
     plot_logs("logs/case"+case+".csv")
