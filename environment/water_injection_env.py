@@ -12,9 +12,12 @@ from utils.read_report_function import *
 
 
 class WaterInjectionEnv(gym.Env):
-    def __init__(self, run_cfd_step_fn, config_path="configs/design_settings.json",
-                 case_dir="cases", trans_controls_path="configs/transient_control_settings.json",
-                 report_path="concentration.out", loss_path="water_loss.out",
+    def __init__(self, run_cfd_step_fn,
+                 config_path="configs/design_settings.json",
+                 case_dir="cases",
+                 trans_controls_path="configs/transient_control_settings.json",
+                 report_path="concentration.out",
+                 loss_path="water_loss.out",
                  water_path="water_usage.out"):
         super().__init__()
 

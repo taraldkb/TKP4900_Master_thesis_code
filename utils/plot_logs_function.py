@@ -48,7 +48,7 @@ def plot_logs(log_path):
 
     # plot policy loss
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-    ax.plot(episodes, rewards, label="Policy Loss")
+    ax.plot(episodes, policy_loss, label="Policy Loss")
     ax.set_xlabel("Episodes")
     ax.set_ylabel("Loss")
     ax.set_title("Policy loss per episode")
@@ -60,7 +60,7 @@ def plot_logs(log_path):
 
     # plot value loss
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-    ax.plot(episodes, rewards, label="ValueLoss")
+    ax.plot(episodes, value_loss, label="ValueLoss")
     ax.set_xlabel("Episodes")
     ax.set_ylabel("Loss")
     ax.set_title("Value loss per episode")
