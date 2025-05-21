@@ -15,4 +15,5 @@ def get_case(H, N):
             return "Case5"
         elif H == 100:
             return "Case6"
-    return "Unknown Case"
+    else:
+        raise ValueError("no case could be found")

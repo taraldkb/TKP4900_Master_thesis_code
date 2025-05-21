@@ -1,9 +1,5 @@
 import torch
 import json
-from environment.water_injection_env import WaterInjectionEnv
-from environment.cfd_interface import run_cfd_step
-from utils.map_value_function import *
-import matplotlib.pyplot as plt
 from rl.network import PolicyNet
 from utils.get_case_function import get_case
 
