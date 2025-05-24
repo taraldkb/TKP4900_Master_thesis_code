@@ -13,7 +13,7 @@ from utils.read_report_function import *
 
 class WaterInjectionEnv(gym.Env):
     def __init__(self, run_cfd_step_fn,
-                 config_path="configs/design_settings.json",
+                 case,
                  case_dir="cases",
                  trans_controls_path="configs/transient_control_settings.json",
                  report_path="concentration.out",
@@ -21,16 +21,25 @@ class WaterInjectionEnv(gym.Env):
                  water_path="water_usage.out"):
         super().__init__()
 
-        # load config
-        with open(config_path, "r") as f:
-            self.design_params = json.load(f)
         # load transient control
         with open(trans_controls_path, "r") as f:
             self.trans_params = json.load(f)
 
+        # Dict of case variables
+        self.case_dict = {
+            "case1": [1, 50],
+            "case2": [1, 75],
+            "case3": [1, 100],
+            "case4": [2, 50],
+            "case5": [2, 75],
+            "case6": [2, 100]
+        }
+
+        self.design_params = self.case_dict[f"case{case}"]
+
         # initial parameters and directories
-        self.N = self.design_params["N"]
-        self.H = self.design_params["H"]
+        self.N = self.design_params[0]
+        self.H = self.design_params[1]
         self.case_dir = case_dir
         self.report_path = report_path
         self.loss_report_path = loss_path
