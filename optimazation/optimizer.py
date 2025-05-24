@@ -11,7 +11,7 @@ Q_m = 1
 Q_u = 1
 
 # get state from CFD
-state = get_state()
+state = []
 
 # remove report files
 cleanup()
