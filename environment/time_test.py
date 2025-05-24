@@ -43,11 +43,11 @@ def test_time():
 
             state, reward, done, _ = env.test_step(action, wind_profile[counter], sp_profile[counter])
             td = datetime.now()-sim_start
-            time_keeper.append(td)
+            time_keeper.append(td.total_seconds()/60)
 
         ep_time = datetime.now()-episode_start
         sim_time.append(time_keeper)
-        episode_total.append(ep_time)
+        episode_total.append(ep_time.total_seconds()/60)
 
     episode_avg = []
     for i in range(len(sim_time)):
