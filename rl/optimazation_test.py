@@ -2,6 +2,7 @@ import torch
 import json
 from rl.network import PolicyNet
 from utils.get_case_function import get_case
+from utils.map_value_function import map_value
 
 
 # read config
@@ -35,7 +36,7 @@ def pi(state, H, N):
             state_tensor = torch.tensor(state, dtype=torch.float32)
             mean, _ = policy(state_tensor)
             action = mean.numpy()
-            flow = N * action[-1]
+            flow = map_value(action[-1], 0, 100)
             mass_flow.append(flow)
 
     return sum(mass_flow)
