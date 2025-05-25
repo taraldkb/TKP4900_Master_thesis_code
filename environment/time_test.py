@@ -33,6 +33,7 @@ def test_time():
         time_keeper = []
         episode_start = datetime.now()
         state = env.testing_reset()
+        done = False
 
         while not done:
             sim_start = datetime.now()
