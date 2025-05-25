@@ -21,7 +21,7 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
     # Unpack state and manipulated variables
     wind_velocity = current_state[-2]
     speed1, speed2, mass_flow = action
-    N = design_params["N"]
+    N = design_params[0]
 
     # Set boundary conditions
     try:
