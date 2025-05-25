@@ -32,7 +32,7 @@ def z_rule(model):
     sum_z = 0
     for i in model.z_index:
         sum_z += model.z[i]
-    return sum_z
+    return sum_z == 1
 
 
 # define variable relations
