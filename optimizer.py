@@ -9,7 +9,8 @@ from utils.cleanup import cleanup
 # --- Constants ---
 h = [50, 75, 100]  # height options
 Q_m = 1
-Q_u = 0.5
+Q_u = 1
+N_cost = 50
 state = [13.99, 14.04, 6.89, 21.62, 4.81, 26.73, 14.65, 2.90, 0, 0]
 
 # Clean up any previous simulation output
@@ -72,7 +73,7 @@ def objective_rule(model):
         for i in model.z_index
     )
 
-    cost_m = H + N * 50
+    cost_m = H + N * N_cost
     return Q_m * cost_m + Q_u * pi_expr
 
 model.obj = Objective(rule=objective_rule, sense=minimize)
