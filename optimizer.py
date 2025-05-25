@@ -9,7 +9,7 @@ from utils.cleanup import cleanup
 # --- Constants ---
 h = [50, 75, 100]  # height options
 Q_m = 1
-Q_u = 0.5
+Q_u = 0.1
 state = [13.99, 14.04, 6.89, 21.62, 4.81, 26.73, 14.65, 2.90, 0, 0]
 
 # Clean up any previous simulation output
@@ -21,7 +21,7 @@ for i, height in enumerate(h):
     for y_val in [0, 1]:  # y = 0 or 1 → N = y + 1
         N = y_val + 1
         pi_val = pi(state, height, N)
-        print(f"mass flow for H= {height}, N = {N} is {pi_val}")
+        #print(f"mass flow for H= {height}, N = {N} is {pi_val}")
         pi_lookup[(i, y_val)] = pi_val
 
 # --- Pyomo Model ---
