@@ -47,8 +47,8 @@ def plot_time(time_logs):
     ax1.set_xticks(x)
     ax1.set_xticklabels(cases)
 
-    ax1.set_ylabel("Episode time [m]")
-    ax2.set_ylabel("Step time [m]")
+    ax1.set_ylabel("Episode time [m]", color=col1)
+    ax2.set_ylabel("Step time [m]", color=col2)
     ax1.set_title("Average episode and simulation step time")
 
     bars = [bar1, bar2]
