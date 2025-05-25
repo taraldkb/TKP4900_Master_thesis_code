@@ -18,14 +18,14 @@ with open("configs/RL_config.json", "r") as f:
 
 
 # create Train agent
-def train_agent(log_name=None):
+def train_agent(case, log_name=None):
 
     if log_name is None:
         log_name = str(date.today())
     log_name = log_name + ".csv"
     log_file = os.path.join(CONFIG['log_dir'], log_name)
 
-    env = WaterInjectionEnv(run_cfd_step)
+    env = WaterInjectionEnv(run_cfd_step, case)
     policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
     value = ValueNet(CONFIG["state_dim"], CONFIG["hidden_size"])
 

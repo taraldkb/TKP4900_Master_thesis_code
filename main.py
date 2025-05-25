@@ -9,7 +9,8 @@ choice = int(input("what to run: "))
 if choice == 0:
     cleanup()
 elif choice == 1:
-    train_agent()
+    case = input("which case: ")
+    train_agent(case)
 elif choice == 2:
     case = input("which case: ")
     ep = int(input("how many episodes: "))
