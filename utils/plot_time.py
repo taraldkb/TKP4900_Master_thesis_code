@@ -35,7 +35,7 @@ def plot_time(time_logs):
     episode_total = time_data["episode"]
     simulation_avg = time_data["avg"]
 
-    x = np.arrange(len(cases))
+    x = np.arange(len(cases))
     width = 0.25
     fig, ax1 = plt.subplots(figsize=(fig_width, fig_height))
 
@@ -51,8 +51,9 @@ def plot_time(time_logs):
     ax2.set_ylabel("Step time [m]")
     ax1.set_title("Average episode and simulation step time")
 
-    ax1.legend(loc='upper left')
-    ax2.legend(loc='upper right')
+    bars = [bar1, bar2]
+    labels = [bar.get_label() for bar in bars]
+    ax1.legend(bars, labels, loc='upper center', ncol=1)
 
     plt.tight_layout()
     fig.savefig("time.pdf")
