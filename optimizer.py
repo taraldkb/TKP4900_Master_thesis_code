@@ -9,7 +9,7 @@ from utils.cleanup import cleanup
 # --- Constants ---
 h = [50, 75, 100]  # height options
 Q_m = 1
-Q_u = 0.1
+Q_u = 0.5
 state = [13.99, 14.04, 6.89, 21.62, 4.81, 26.73, 14.65, 2.90, 0, 0]
 
 # Clean up any previous simulation output
