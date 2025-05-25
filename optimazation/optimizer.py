@@ -11,7 +11,7 @@ Q_m = 1
 Q_u = 1
 
 # get state from CFD
-state = []
+state = [13.99, 14.04, 6.89, 21.62, 4.81, 26.73, 14.65, 2.90]
 
 # remove report files
 cleanup()
