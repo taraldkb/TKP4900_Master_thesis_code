@@ -14,13 +14,13 @@ elif choice == 1:
 elif choice == 2:
     case = input("which case: ")
     ep = int(input("how many episodes: "))
-    continue_train_agent("Save/Case"+case+".pt", "logs/case"+case+".csv", ep)
+    continue_train_agent("Save/Case"+case+".pt", "logs/case"+case+".csv", case, ep)
 elif choice == 3:
     case = input("which case: ")
     plot_logs("logs/case"+case+".csv")
 elif choice == 4:
     case = input("which case: ")
-    test_agent("Save/Case"+case+".pt")
+    test_agent(case, "Save/Case"+case+".pt")
 else:
     print("nope")
 

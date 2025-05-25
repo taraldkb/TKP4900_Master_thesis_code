@@ -32,8 +32,8 @@ with open("configs/RL_config.json", "r") as f:
 
 
 # create tester
-def test_agent(policy_path=CONFIG["save_path"]):
-    env = WaterInjectionEnv(run_cfd_step)
+def test_agent(case, policy_path=CONFIG["save_path"]):
+    env = WaterInjectionEnv(run_cfd_step, case)
     policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
     policy.load_state_dict(torch.load(policy_path))
     policy.eval()

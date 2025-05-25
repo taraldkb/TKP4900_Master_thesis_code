@@ -96,9 +96,9 @@ def train_agent(case, log_name=None):
     print("Training complete. Best reward:", best_reward)
 
 
-def continue_train_agent(policy_path, log_path, episodes=100):
+def continue_train_agent(policy_path, log_path, case, episodes=100):
 
-    env = WaterInjectionEnv(run_cfd_step)
+    env = WaterInjectionEnv(run_cfd_step, case)
     policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
     policy.load_state_dict(torch.load(policy_path))
     value = ValueNet(CONFIG["state_dim"], CONFIG["hidden_size"])
