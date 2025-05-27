@@ -2,7 +2,9 @@ from rl.train import train_agent, continue_train_agent
 from rl.test import test_agent
 from utils.cleanup import cleanup
 from utils.plot_logs_function import plot_logs
+import runpy
 from rl.run_test import test_multiple
+
 
 
 choice = int(input("what to run: "))
@@ -21,8 +23,11 @@ elif choice == 3:
     plot_logs("logs/case"+case+".csv")
 elif choice == 4:
     case = input("which case: ")
-    test_agent(int(case), "Save/Case"+case+".pt")
+    test_agent(case, "Save/Case"+case+".pt")
 elif choice == 5:
+    runpy.run_path("optimazation/optimizer.py")
+    test_agent(int(case), "Save/Case"+case+".pt")
+elif choice == 6:
     test_multiple()
 else:
     print("nope")
