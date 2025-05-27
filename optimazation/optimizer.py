@@ -1,4 +1,3 @@
-import numpy as np
 from pyomo.environ import ConcreteModel, Var, Objective, Constraint, \
     SolverFactory, Binary, value, RangeSet, Param, minimize
 from rl.optimazation_test import pi
@@ -120,9 +119,3 @@ total_cost = Q_m * cost_m_opt + Q_u * pi_opt
 print(f"Optimal H: {H_opt}")
 print(f"Optimal N: {N_opt}")
 print(f"Total cost: {total_cost}")
-
-
-
-
-
-
