@@ -2,7 +2,7 @@ from rl.train import train_agent, continue_train_agent
 from rl.test import test_agent
 from utils.cleanup import cleanup
 from utils.plot_logs_function import plot_logs
-import os
+import runpy
 
 choice = int(input("what to run: "))
 
@@ -21,6 +21,8 @@ elif choice == 3:
 elif choice == 4:
     case = input("which case: ")
     test_agent(case, "Save/Case"+case+".pt")
+elif choice == 6:
+    runpy.run_path("optimazation/optimizer.py")
 else:
     print("nope")
 

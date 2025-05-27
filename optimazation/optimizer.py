@@ -1,6 +1,6 @@
 import numpy as np
 from pyomo.environ import ConcreteModel, Var, Objective, Constraint, \
-    SolverFactory, Binary, summation, value, RangeSet, Expr_if, Param, minimize
+    SolverFactory, Binary, value, RangeSet, Param, minimize
 from rl.optimazation_test import pi
 from optimazation.get_state_function import get_state
 from utils.cleanup import cleanup
@@ -42,7 +42,11 @@ model.y = Var(domain=Binary)
 model.w = Var(model.z_index, domain=Binary)
 
 # create parameters
-model.pi = Param(model.z_index, model.y_index, initialize=pi_lookup, mutable=True)
+model.pi = Param(model.z_index,
+                 model.y_index,
+                 initialize=pi_lookup,
+                 mutable=True
+                 )
 
 # create constraints
 
