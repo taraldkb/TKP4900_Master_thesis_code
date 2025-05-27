@@ -26,7 +26,6 @@ elif choice == 4:
     test_agent(case, "Save/Case"+case+".pt")
 elif choice == 5:
     runpy.run_path("optimazation/optimizer.py")
-    test_agent(int(case), "Save/Case"+case+".pt")
 elif choice == 6:
     test_multiple()
 else:
