@@ -39,7 +39,7 @@ class WaterInjectionEnv(gym.Env):
 
         # initial parameters and directories
         self.N = self.design_params[0]
-        self.H = self.design_params[0]
+        self.H = self.design_params[1]
         self.case_dir = case_dir
         self.report_path = report_path
         self.loss_report_path = loss_path

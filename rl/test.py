@@ -115,7 +115,7 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
         ax.legend()
         ax.grid()
         fig.tight_layout()
-        fig.savefig(f"injection_vel_run{ep+1}.pdf")
+        fig.savefig(f"case{case}_injection_vel_run{ep+1}.pdf")
         plt.show()
 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
@@ -125,7 +125,7 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
         ax.set_title(f"Injection mass flow test run {ep+1}")
         ax.grid()
         fig.tight_layout()
-        fig.savefig(f"mass_flow_run{ep + 1}.pdf")
+        fig.savefig(f"case{case}_mass_flow_run{ep + 1}.pdf")
         plt.show()
 
 
@@ -140,7 +140,7 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
         ax.set_ylabel(r"Concentration [kg/m$^3$]")
         ax.set_title(f"Concentrations left zones and Setpoint test run {ep+1}")
         fig.tight_layout()
-        fig.savefig(f"concentrationLeft{ep + 1}.pdf")
+        fig.savefig(f"case{case}_concentrationLeft{ep + 1}.pdf")
         plt.show()
 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
@@ -153,5 +153,5 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
         ax.set_ylabel(r"Concentration [kg/m$^3$]")
         ax.set_title(f"Concentrations right zones and Setpoint test run {ep+1}")
         fig.tight_layout()
-        fig.savefig(f"concentrationRight{ep + 1}.pdf")
+        fig.savefig(f"case{case}_concentrationRight{ep + 1}.pdf")
         plt.show()
