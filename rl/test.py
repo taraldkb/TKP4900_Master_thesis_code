@@ -34,17 +34,23 @@ with open("configs/RL_config.json", "r") as f:
 # create tester
 def test_agent(case, policy_path=CONFIG["save_path"]):
     env = WaterInjectionEnv(run_cfd_step, case)
-    policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
+    policy = PolicyNet(
+        CONFIG["state_dim"],
+        CONFIG["action_dim"],
+        CONFIG["hidden_size"])
+
     policy.load_state_dict(torch.load(policy_path))
     policy.eval()
 
     time_step = list(range(0, 23, 2))
-    wind_profiles_lib = [[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-                         [0.5, 0.95, 0.95, 0.95, 0.95, 0.2, 0.2, 0.2, 0.2, 0.2],
-                         [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 0.8]]
-    sp_profiles_lib = [[20.0, 25.0, 25.0, 25.0, 30.0, 30.0, 10.0, 10.0, 10.0, 10.0],
-                       [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0],
-                       [20.0, 25.0, 30.0, 30.0,  30.0, 30.0, 30.0, 30.0, 30.0, 30.0]]
+    wind_profiles_lib = [
+        [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+        [0.5, 0.95, 0.95, 0.95, 0.95, 0.2, 0.2, 0.2, 0.2, 0.2],
+        [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 0.8]]
+    sp_profiles_lib = [
+        [20.0, 25.0, 25.0, 25.0, 30.0, 30.0, 10.0, 10.0, 10.0, 10.0],
+        [20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0],
+        [20.0, 25.0, 30.0, 30.0,  30.0, 30.0, 30.0, 30.0, 30.0, 30.0]]
 
     for ep in range(3):
         # get variable profile
@@ -73,7 +79,10 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
 
         while not done:
             with torch.no_grad():
-                state_tensor = torch.tensor(state, dtype=torch.float32)
+                state_tensor = torch.tensor(
+                    state,
+                    dtype=torch.float32)
+
                 mean, _ = policy(state_tensor)
                 action = mean.numpy()
 
@@ -82,7 +91,11 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
                 injection2.append(map_value(action[1], 0, 20))
                 mass.append((map_value(action[2], 0, 100)))
 
-            state, reward, done, _ = env.test_step(action, wind_profile[counter], sp_profile[counter])
+            state, reward, done, _ = env.test_step(
+                action,
+                wind_profile[counter],
+                sp_profile[counter])
+
             total_reward += reward
 
             # save reward and state for plotting
@@ -107,8 +120,10 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
 
         # Plotting
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-        ax.step(time_step, injection1, where="post", label="Injection 1")
-        ax.step(time_step, injection2, where="post", label="Injection 2")
+        ax.step(time_step, injection1,
+                where="post", label="Injection 1")
+        ax.step(time_step, injection2,
+                where="post", label="Injection 2")
         ax.set_xlabel("Time [s]")
         ax.set_ylabel("Velocity [m/s]")
         ax.set_title(f"Injection velocity test run {ep+1}")
@@ -128,12 +143,12 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
         fig.savefig(f"case{case}_mass_flow_run{ep + 1}.pdf")
         plt.show()
 
-
-
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-        ax.step(time_step, sp_plot, where="post", label="Concentration setpoint")
+        ax.step(time_step, sp_plot,
+                where="post", label="Concentration setpoint")
         for i in range(4):
-            ax.step(time_step, conc_plot[i], where="post", label=f"Zone {i+1}")
+            ax.step(time_step, conc_plot[i],
+                    where="post", label=f"Zone {i+1}")
         ax.grid()
         ax.legend()
         ax.set_xlabel("Time [s]")
@@ -144,9 +159,11 @@ def test_agent(case, policy_path=CONFIG["save_path"]):
         plt.show()
 
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-        ax.step(time_step, sp_plot, where="post", label="Concentration setpoint")
+        ax.step(time_step, sp_plot,
+                where="post", label="Concentration setpoint")
         for i in range(4, 8):
-            ax.step(time_step, conc_plot[i], where="post", label=f"Zone {i + 1}")
+            ax.step(time_step, conc_plot[i],
+                    where="post", label=f"Zone {i + 1}")
         ax.grid()
         ax.legend()
         ax.set_xlabel("Time [s]")

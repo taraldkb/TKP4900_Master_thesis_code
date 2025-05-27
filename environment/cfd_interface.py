@@ -5,7 +5,10 @@ from utils.read_report_function import *
 from utils.map_value_function import *
 
 
-def run_cfd_step(solver, current_state, action, design_params, report_path, water_report_path):
+def run_cfd_step(solver, current_state,
+                 action,
+                 design_params, report_path,
+                 water_report_path):
 
     """
     Run a step in cfd model, 2 seconds/ 20 time steps
@@ -25,8 +28,8 @@ def run_cfd_step(solver, current_state, action, design_params, report_path, wate
 
     # Set boundary conditions
     try:
-        solver.setup.boundary_conditions.velocity_inlet["wind"].momentum.velocity.value = \
-            map_value(wind_velocity, 0.0, 20.0)
+        solver.setup.boundary_conditions.velocity_inlet["wind"].\
+            momentum.velocity.value = map_value(wind_velocity, 0.0, 20.0)
 
     except Exception as e:
         print(f"[WARNING] Could not set wind velocity: {e}")
