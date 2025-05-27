@@ -6,7 +6,6 @@ import runpy
 from rl.run_test import test_multiple
 
 
-
 choice = int(input("what to run: "))
 
 if choice == 0:
