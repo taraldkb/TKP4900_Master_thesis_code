@@ -1,4 +1,3 @@
-
 # get case name from design parameters
 def get_case(H, N):
     if N == 1:

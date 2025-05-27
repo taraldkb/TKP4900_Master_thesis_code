@@ -1,6 +1,5 @@
 import torch
 
-
 # create utility functions
 def compute_returns(rewards, gamma):
     returns = []

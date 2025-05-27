@@ -2,8 +2,10 @@ import os
 import time
 
 
-def cleanup(report_path="concentration.out", loss_report_path="water_loss.out",
+def cleanup(report_path="concentration.out",
+            loss_report_path="water_loss.out",
             water_usage_report_path="water_usage.out"):
+
     while os.path.exists(report_path):
         try:
             os.remove(report_path)

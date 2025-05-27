@@ -2,11 +2,11 @@ import statistics as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def read_concentrations(file_path):
 
     """
-    Function to read report.out file and return cleaned and manipulated data
+    Function to read report.out file and return
+    cleaned and manipulated data
 
     :param file_path: report.out file path
     :return data, array size (8, )  [concentration X8]
@@ -20,8 +20,10 @@ def read_concentrations(file_path):
             lines = lines[3:]  # remove headers
 
             for line in lines:
-                holder = line.strip().split()   # remove whitespace and split into a list
-                holder = holder[2:]  # remove time step counter
+                # remove whitespace and split into a list
+                holder = line.strip().split()
+                # remove time step counter
+                holder = holder[2:]
 
                 for i in range(len(holder)):
                     data[i].append(float(holder[i]))
@@ -37,7 +39,8 @@ def read_concentrations(file_path):
 
 def read_single_data_file(file_path):
     """
-    Read .out file containing water loss data and return cleansed  and manipulated datadata
+    Read .out file containing water loss data
+     and return cleansed  and manipulated datadata
     :param file_path: file path to water loss file location str
     :return data: float variable with mean of last 10 time steps
     """
