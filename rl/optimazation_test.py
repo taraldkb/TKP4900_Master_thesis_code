@@ -23,7 +23,11 @@ def pi(state, H, N):
     case = get_case(H, N)
     case_policy = "Save/"+case+".pt"
 
-    policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
+    policy = PolicyNet(
+        CONFIG["state_dim"],
+        CONFIG["action_dim"],
+        CONFIG["hidden_size"])
+
     policy.load_state_dict(torch.load(case_policy))
     policy.eval()
 
@@ -39,7 +43,3 @@ def pi(state, H, N):
             mass_flow.append(flow)
 
     return sum(mass_flow)
-
-
-
-

@@ -26,21 +26,32 @@ def train_agent(case, log_name=None):
     log_file = os.path.join(CONFIG['log_dir'], log_name)
 
     env = WaterInjectionEnv(run_cfd_step, case)
-    policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
-    value = ValueNet(CONFIG["state_dim"], CONFIG["hidden_size"])
+    policy = PolicyNet(
+        CONFIG["state_dim"],
+        CONFIG["action_dim"],
+        CONFIG["hidden_size"])
 
-    optimizer_policy = optim.Adam(policy.parameters(), lr=CONFIG["lr_policy"])
-    optimizer_value = optim.Adam(value.parameters(), lr=CONFIG["lr_value"])
+    value = ValueNet(
+        CONFIG["state_dim"],
+        CONFIG["hidden_size"])
+
+    optimizer_policy = optim.Adam(
+        policy.parameters(), lr=CONFIG["lr_policy"])
+    optimizer_value = optim.Adam(
+        value.parameters(), lr=CONFIG["lr_value"])
 
     # create learning rate schedulers
-    scheduler_policy = StepLR(optimizer_policy, step_size=75, gamma=0.9)
-    scheduler_value = StepLR(optimizer_value, step_size=75, gamma=0.9)
+    scheduler_policy = StepLR(
+        optimizer_policy, step_size=75, gamma=0.9)
+    scheduler_value = StepLR(
+        optimizer_value, step_size=75, gamma=0.9)
 
     best_reward = -float("inf")
 
     with open(log_file, mode="w", newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(["episode", "reward", "policy_loss", "value_loss"])
+        csv_writer.writerow(
+            ["episode", "reward", "policy_loss", "value_loss"])
 
         for episode in range(CONFIG["epochs"]):
             state = env.reset()
@@ -49,7 +60,8 @@ def train_agent(case, log_name=None):
             total_reward = 0
 
             while not done:
-                state_tensor = torch.tensor(state, dtype=torch.float32)
+                state_tensor = torch.tensor(
+                    state, dtype=torch.float32)
                 mean, std = policy(state_tensor)
                 dist = Normal(mean, std)
                 action = dist.sample()
@@ -59,7 +71,8 @@ def train_agent(case, log_name=None):
                 log_prob = dist.log_prob(action).sum()
                 value_est = value(state_tensor)
 
-                next_state, reward, done, _ = env.step(action.detach().numpy())
+                next_state, reward, done, _ = env.step(
+                    action.detach().numpy())
 
                 log_probs.append(log_prob)
                 rewards.append(reward)
@@ -82,7 +95,8 @@ def train_agent(case, log_name=None):
             value_loss.backward()
             optimizer_value.step()
 
-            csv_writer.writerow([episode, total_reward, policy_loss.item(), value_loss.item()])
+            csv_writer.writerow(
+                [episode, total_reward, policy_loss.item(), value_loss.item()])
             csvfile.flush()
 
             # step scheduler
@@ -99,16 +113,27 @@ def train_agent(case, log_name=None):
 def continue_train_agent(policy_path, log_path, case, episodes=100):
 
     env = WaterInjectionEnv(run_cfd_step, case)
-    policy = PolicyNet(CONFIG["state_dim"], CONFIG["action_dim"], CONFIG["hidden_size"])
-    policy.load_state_dict(torch.load(policy_path))
-    value = ValueNet(CONFIG["state_dim"], CONFIG["hidden_size"])
+    policy = PolicyNet(
+        CONFIG["state_dim"],
+        CONFIG["action_dim"],
+        CONFIG["hidden_size"])
 
-    optimizer_policy = optim.Adam(policy.parameters(), lr=CONFIG["lr_policy"])
-    optimizer_value = optim.Adam(value.parameters(), lr=CONFIG["lr_value"])
+    policy.load_state_dict(torch.load(policy_path))
+
+    value = ValueNet(
+        CONFIG["state_dim"],
+        CONFIG["hidden_size"])
+
+    optimizer_policy = optim.Adam(
+        policy.parameters(), lr=CONFIG["lr_policy"])
+    optimizer_value = optim.Adam(
+        value.parameters(), lr=CONFIG["lr_value"])
 
     # create learning rate schedulers
-    scheduler_policy = StepLR(optimizer_policy, step_size=75, gamma=0.9)
-    scheduler_value = StepLR(optimizer_value, step_size=75, gamma=0.9)
+    scheduler_policy = StepLR(
+        optimizer_policy, step_size=75, gamma=0.9)
+    scheduler_value = StepLR(
+        optimizer_value, step_size=75, gamma=0.9)
 
     # find last recorded episode and current best reward
     last_episode = -1
@@ -135,7 +160,9 @@ def continue_train_agent(policy_path, log_path, case, episodes=100):
     with open(log_path, mode="a", newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
         if last_episode == -1:
-            csv_writer.writerow(["episode", "reward", "policy_loss", "value_loss"])  # create header if new file
+            # create header if new file
+            csv_writer.writerow(
+                ["episode", "reward", "policy_loss", "value_loss"])
 
         for episode in range(episodes):
             episode_number = last_episode + 1 + episode
@@ -145,7 +172,9 @@ def continue_train_agent(policy_path, log_path, case, episodes=100):
             total_reward = 0
 
             while not done:
-                state_tensor = torch.tensor(state, dtype=torch.float32)
+                state_tensor = torch.tensor(
+                    state, dtype=torch.float32)
+
                 mean, std = policy(state_tensor)
                 dist = Normal(mean, std)
                 action = dist.sample()
@@ -155,7 +184,8 @@ def continue_train_agent(policy_path, log_path, case, episodes=100):
                 log_prob = dist.log_prob(action).sum()
                 value_est = value(state_tensor)
 
-                next_state, reward, done, _ = env.step(action.detach().numpy())
+                next_state, reward, done, _ = env.step(
+                    action.detach().numpy())
 
                 log_probs.append(log_prob)
                 rewards.append(reward)
@@ -178,7 +208,9 @@ def continue_train_agent(policy_path, log_path, case, episodes=100):
             value_loss.backward()
             optimizer_value.step()
 
-            csv_writer.writerow([episode_number, total_reward, policy_loss.item(), value_loss.item()])
+            csv_writer.writerow(
+                [episode_number, total_reward, policy_loss.item(), value_loss.item()])
+
             csvfile.flush()
             # step scheduler
             scheduler_policy.step()
