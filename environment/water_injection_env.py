@@ -1,13 +1,11 @@
 import gymnasium as gym
 from gymnasium import spaces
-import numpy as np
 import os
 import json
 import ansys.fluent.core as pyfluent
 from ansys.fluent.core import launch_fluent
 import random
 import time
-
 from utils.read_report_function import *
 
 
@@ -78,17 +76,24 @@ class WaterInjectionEnv(gym.Env):
 
         # create initial state and actions for initializing system
         self.initial_actions = np.array([0.25, 0.25, 0.5])
-        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
+        self.state = np.concatenate(
+            [np.full(8, 0.0),
+             [self._current_wind],
+             [self.setpoint]])
 
         # create action space 3 actions [injection1, injection2, mass_flow]
-        self.action_space = spaces.Box(low=0.0,
-                                       high=1.0,
-                                       shape=(3,), dtype=np.float32)
+        self.action_space = spaces.Box(
+            low=0.0,
+            high=1.0,
+            shape=(3,),
+            dtype=np.float32)
 
         # create observation space 10 obs [8 zones, wind, setpoint]
-        self.observation_space = spaces.Box(low=np.zeros(10),
-                                            high=np.append(np.full(8, 100), [1.0, 50]),
-                                            shape=(10,), dtype=np.float32)
+        self.observation_space = spaces.Box(
+            low=np.zeros(10),
+            high=np.append(np.full(8, 100), [1.0, 50]),
+            shape=(10,),
+            dtype=np.float32)
 
     def reset(self):  # reset environment for new episode
         self._start_fluent_with_case()
@@ -97,7 +102,10 @@ class WaterInjectionEnv(gym.Env):
         self.episode_count += 1
         self.step_count = 0
         self._get_profiles()
-        self.state = np.concatenate([np.full(8, 0.0), [self._current_wind], [self.setpoint]])
+        self.state = np.concatenate(
+            [np.full(8, 0.0),
+             [self._current_wind],
+             [self.setpoint]])
         self._get_initial_state()
 
         return self.state
@@ -116,7 +124,9 @@ class WaterInjectionEnv(gym.Env):
         )
 
         self.state = np.concatenate([next_state, [self.setpoint]])
-        reward = self._compute_reward(self.state, action, water_loss)
+        reward = self._compute_reward(self.state,
+                                      action,
+                                      water_loss)
         self._update_variables()  # update setpoint and wind
         self.step_count += 1
         done = self.step_count >= self.max_steps
@@ -135,7 +145,8 @@ class WaterInjectionEnv(gym.Env):
         sp = state[-1]
         return -np.sum((moisture - sp) ** 2) - 0.01 * np.sum(action ** 2) - 0.1*water_loss
 
-    def _start_fluent_with_case(self):  # start fluent solver with correct case setup
+    # start fluent solver with correct case setup
+    def _start_fluent_with_case(self):
 
         # remove active sessions
         if self.fluent_session is not None:
@@ -169,8 +180,11 @@ class WaterInjectionEnv(gym.Env):
         case_file = f"N{self.N}_H{self.H}.cas.h5"
         case_path = os.path.join(self.case_dir, case_file)
 
-        if not os.path.exists(case_path):  # check for existing file if not raise error
-            raise FileNotFoundError(f"Fluent case file not found: {case_path}")
+        # check for existing file if not raise error
+        if not os.path.exists(case_path):
+            raise FileNotFoundError(
+                f"Fluent case file not found: {case_path}"
+            )
 
         # create fluent session and load correct case
         counter = 0
