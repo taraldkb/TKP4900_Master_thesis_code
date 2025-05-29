@@ -1,5 +1,3 @@
-import numpy as np
-import time
 import os
 from utils.read_report_function import *
 from utils.map_value_function import *
@@ -64,10 +62,3 @@ def run_cfd_step(solver, current_state,
     water_loss = read_single_data_file(water_report_path)
 
     return next_state, water_loss
-
-
-
-
-
-
-
